@@ -11,6 +11,10 @@ VAR_INPUT
     t_e : REAL;
     p : REAL;
     s : REAL;
+    
+    //kwantyfikatory
+    kwantyfikator_wzgledny : REAL;
+    kwantyfikator_bezwzgledny : REAL;
 END_VAR
 
 // 1. Atrakcyjność wizualna
@@ -87,6 +91,30 @@ FUZZIFY s
     TERM sredni := (175, 0) (1800, 1) (5500, 1) (7000, 0);
     TERM popularny := (6500, 0) (15000, 1) (25000, 1) (55000, 0);
     TERM bardzo_popularny := (50000, 0) (100000, 1) (843300, 1);
+END_FUZZIFY
+
+
+// ---- KWANTYFIKATORY ----
+
+// Kwantyfikatory względne
+FUZZIFY kwantyfikator_wzgledny
+    TERM prawie_nic := (0, 1) (0.05, 1) (0.15, 0);
+    TERM okolo_1_4 := (0.10, 0) (0.20, 1) (0.30, 1) (0.40, 0);
+    TERM okolo_polowy := (0.35, 0) (0.45, 1) (0.55, 1) (0.65, 0);
+    TERM okolo_3_4 := (0.60, 0) (0.70, 1) (0.80, 1) (0.90, 0);
+    TERM prawie_wszystkie := (0.85, 0) (0.95, 1) (1.0, 1);
+    TERM mniejszosc := (0, 1) (0.30, 1) (0.50, 0);
+    TERM wiekszosc := (0.50, 0) (0.70, 1) (1.0, 1);
+END_FUZZIFY
+
+
+// Kwantyfikatory bezwzględne
+FUZZIFY kwantyfikator_bezwzgledny
+    TERM okolo_0 := (0, 1) (1000, 1) (6000, 0); 
+    TERM okolo_10_tys := (4000, 0) (8000, 1) (12000, 1) (16000, 0);
+    TERM okolo_20_tys := (14000, 0) (18000, 1) (22000, 1) (26000, 0);
+    TERM okolo_30_tys := (24000, 0) (28000, 1) (32000, 1) (36000, 0);
+    TERM okolo_40_tys := (34000, 0) (38462, 1) (40000, 1);
 END_FUZZIFY
 
 END_FUNCTION_BLOCK
