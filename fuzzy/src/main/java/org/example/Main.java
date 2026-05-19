@@ -1,17 +1,48 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import net.sourceforge.jFuzzyLogic.FIS;
+import net.sourceforge.jFuzzyLogic.FunctionBlock;
+
+import java.io.InputStream;
+
 public class Main {
     static void main() {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
         IO.println(String.format("Hello and welcome!"));
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            IO.println("i = " + i);
+        // 1. Wskazanie ścieżki do pliku FCL
+        // Ładowanie pliku z zasobów aplikacji (ClassPath)
+        // Znak "/" na początku oznacza szukanie od głównego katalogu resources
+        InputStream in = Main.class.getResourceAsStream("/tipper.fcl");
+
+        if (in == null) {
+            System.err.println("BŁĄD: Nie znaleziono pliku tipper.fcl w zasobach projektu (ClassPath)!");
+            System.err.println("Upewnij się, że plik znajduje się w katalogu src/main/resources/");
+            return;
         }
+
+        // Tworzenie obiektu FIS ze strumienia danych
+        FIS fis = FIS.load(in, true);
+
+        // Zabezpieczenie na wypadek błędu w pliku lub złej ścieżki
+        if (fis == null) {
+            System.err.println("Nie można załadować pliku");
+            return;
+        }
+
+        // 2. Pobranie domyślnego bloku funkcyjnego
+        FunctionBlock functionBlock = fis.getFunctionBlock(null);
+
+        // 3. Ustawienie zmiennych wejściowych
+        functionBlock.setVariable("service", 3.0);
+        functionBlock.setVariable("food", 7.0);
+
+        // 4. Uruchomienie wnioskowania rozmytego
+        functionBlock.evaluate();
+
+        // 5. Pobranie i wyświetlenie wyniku
+        double tip = functionBlock.getVariable("tip").getValue();
+        System.out.println("=========================================");
+        System.out.printf("Sugerowana kwota napiwku: %.2f%%\n", tip);
+        System.out.println("=========================================");
     }
 }
