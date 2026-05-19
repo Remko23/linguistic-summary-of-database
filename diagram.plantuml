@@ -1,0 +1,202 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class AbsoluteQuantifier {
+  + AbsoluteQuantifier(String, FuzzySet): 
+}
+class ClassicSet {
+  + ClassicSet(Set<Double>): 
+  + ClassicSet(double, double): 
+  - minBound: double
+  - discreteElements: Set<Double>
+  - isContinuous: boolean
+  - maxBound: double
+  + contains(double): boolean
+   maxBound: double
+   discreteElements: Set<Double>
+   minBound: double
+   isContinuous: boolean
+}
+class ConsoleRunner {
+  + ConsoleRunner(): 
+  + start(): void
+  - runDemoScenario(): void
+}
+class DataEntity {
+  + DataEntity(int, String): 
+  - label: String
+  - id: int
+  - numericAttributes: Map<String, Double>
+  + getAttribute(String): Double
+  + addAttribute(String, double): void
+  + toString(): String
+   numericAttributes: Map<String, Double>
+   id: int
+   label: String
+}
+class DbConnectionManager {
+  + DbConnectionManager(): 
+  + shutdown(): void
+   connection: Connection
+}
+class FuzzyProperties {
+  + FuzzyProperties(): 
+  + height(FuzzySet): double
+  + isNormal(FuzzySet): boolean
+  + support(FuzzySet): ClassicSet
+  + alphaCut(FuzzySet, double): ClassicSet
+}
+class FuzzySet {
+  + FuzzySet(ClassicSet, MembershipFunction): 
+  - membershipFunction: MembershipFunction
+  - universe: ClassicSet
+  + union(FuzzySet): FuzzySet
+  + intersect(FuzzySet): FuzzySet
+  + getMembership(double): double
+  + complement(): FuzzySet
+   membershipFunction: MembershipFunction
+   universe: ClassicSet
+}
+class GaussianMembershipFunction {
+  + GaussianMembershipFunction(double, double): 
+  - mean: double
+  - sigma: double
+  + getMembership(double): double
+   mean: double
+   sigma: double
+}
+class JdbcRecordRepository {
+  + JdbcRecordRepository(): 
+  - generateMockData(): List<DataEntity>
+  + getRecordsByCriteria(String): List<DataEntity>
+   allRecords: List<DataEntity>
+}
+class Launcher {
+  + Launcher(): 
+  + main(String[]): void
+}
+class LinguisticSummaryDTO {
+  + LinguisticSummaryDTO(String): 
+  - summaryText: String
+  - overallScore: double
+  - qualityMeasures: Map<Integer, Double>
+  + setMeasure(int, double): void
+  + toString(): String
+  + getMeasure(int): double
+   qualityMeasures: Map<Integer, Double>
+   summaryText: String
+   overallScore: double
+}
+class LinguisticVariable {
+  + LinguisticVariable(String): 
+  - attributeName: String
+  - labels: Map<String, FuzzySet>
+  + addLabel(String, FuzzySet): void
+  + getLabelSet(String): FuzzySet
+   labelsMap: Map<String, FuzzySet>
+   attributeName: String
+   labels: Set<String>
+}
+class Main {
+  + Main(): 
+  + main(String[]): void
+  + start(Stage): void
+}
+class Main {
+  + Main(): 
+  + main(String[]): void
+}
+class MainWindowController {
+  + MainWindowController(): 
+  - handleHelloAction(ActionEvent): void
+  + initialize(): void
+  - handleGenerateAction(ActionEvent): void
+}
+interface MembershipFunction << interface >> {
+  + getMembership(double): double
+}
+class OptimalSummaryOptimizer {
+  + OptimalSummaryOptimizer(): 
+  + optimize(List<LinguisticSummaryDTO>, Map<Integer, Double>): List<LinguisticSummaryDTO>
+}
+class QualityEvaluator {
+  + QualityEvaluator(): 
+  + evaluateT2(List<FuzzySet>): double
+  + evaluateT5(List<FuzzySet>): double
+  + evaluateT9(List<FuzzySet>): double
+  + evaluateT1(List<DataEntity>, Quantifier, FuzzySet, List<FuzzySet>): double
+  - degreeOfImprecision(FuzzySet): double
+  + evaluateT7(Quantifier): double
+  + evaluateT4(List<FuzzySet>): double
+  + evaluateT10(FuzzySet): double
+  + evaluateT8(List<FuzzySet>): double
+  - evaluateSingleMembership(DataEntity, FuzzySet): double
+  + evaluateT11(FuzzySet): double
+  + evaluateT3(List<DataEntity>, FuzzySet, List<FuzzySet>): double
+  + evaluateT6(Quantifier): double
+  - evaluateCombinedMembership(DataEntity, List<FuzzySet>): double
+}
+class Quantifier {
+  + Quantifier(String, FuzzySet): 
+  # name: String
+  # fuzzySet: FuzzySet
+  + getMembership(double): double
+   name: String
+   fuzzySet: FuzzySet
+}
+interface RecordRepository << interface >> {
+  + getRecordsByCriteria(String): List<DataEntity>
+   allRecords: List<DataEntity>
+}
+class RelativeQuantifier {
+  + RelativeQuantifier(String, FuzzySet): 
+}
+class ResultPrinter {
+  + ResultPrinter(): 
+  + printResults(List<LinguisticSummaryDTO>): void
+  - truncate(String, int): String
+}
+class SubjectPartitioner {
+  + SubjectPartitioner(): 
+  + split(List<DataEntity>, Predicate<DataEntity>): List<List<DataEntity>>
+  + filter(List<DataEntity>, Predicate<DataEntity>): List<DataEntity>
+}
+class SummaryGenerator {
+  + SummaryGenerator(): 
+  + generateSingleSubject(List<DataEntity>, List<Quantifier>, List<FuzzySet>, List<LinguisticVariable>): List<LinguisticSummaryDTO>
+  + generateMultiSubject(List<DataEntity>, List<DataEntity>, String, String, List<Quantifier>, List<LinguisticVariable>): List<LinguisticSummaryDTO>
+  - buildSentence(String, FuzzySet, String, String): String
+}
+class TrapezoidalMembershipFunction {
+  + TrapezoidalMembershipFunction(double, double, double, double): 
+  - c: double
+  - a: double
+  - b: double
+  - d: double
+  + getMembership(double): double
+   d: double
+   c: double
+   b: double
+   a: double
+}
+class TriangularMembershipFunction {
+  + TriangularMembershipFunction(double, double, double): 
+  - c: double
+  - b: double
+  - a: double
+  + getMembership(double): double
+   c: double
+   b: double
+   a: double
+}
+
+AbsoluteQuantifier             -[#000082,plain]-^  Quantifier                    
+GaussianMembershipFunction     -[#008200,dashed]-^  MembershipFunction            
+JdbcRecordRepository           -[#008200,dashed]-^  RecordRepository              
+RelativeQuantifier             -[#000082,plain]-^  Quantifier                    
+TrapezoidalMembershipFunction  -[#008200,dashed]-^  MembershipFunction            
+TriangularMembershipFunction   -[#008200,dashed]-^  MembershipFunction            
+@enduml
