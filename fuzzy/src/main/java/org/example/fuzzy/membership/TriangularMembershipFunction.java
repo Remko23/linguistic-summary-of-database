@@ -1,37 +1,27 @@
 package org.example.fuzzy.membership;
 
-/**
- * Implements a triangular membership function.
- * Defined by three parameters: a (left foot), b (peak), c (right foot).
- */
-public class TriangularMembershipFunction implements MembershipFunction {
-    private final double a;
-    private final double b;
-    private final double c;
+import net.sourceforge.jFuzzyLogic.membership.MembershipFunctionTriangular;
+import net.sourceforge.jFuzzyLogic.membership.Value;
 
+public class TriangularMembershipFunction extends MembershipFunctionTriangular {
+    
     public TriangularMembershipFunction(double a, double b, double c) {
-        if (a > b || b > c) {
-            throw new IllegalArgumentException("Parameters must satisfy a <= b <= c");
-        }
-        this.a = a;
-        this.b = b;
-        this.c = c;
+        super(new Value(a), new Value(b), new Value(c));
     }
 
-    @Override
     public double getMembership(double x) {
-        if (x <= a || x >= c) {
-            return 0.0;
-        } else if (x == b) {
-            return 1.0;
-        } else if (x > a && x < b) {
-            return (x - a) / (b - a);
-        } else { // x > b && x < c
-            return (c - x) / (c - b);
-        }
+        return membership(x);
     }
 
-    public double getA() { return a; }
-    public double getB() { return b; }
-    public double getC() { return c; }
+    public double getA() {
+        return getParameter(0);
+    }
+
+    public double getB() {
+        return getParameter(1);
+    }
+
+    public double getC() {
+        return getParameter(2);
+    }
 }

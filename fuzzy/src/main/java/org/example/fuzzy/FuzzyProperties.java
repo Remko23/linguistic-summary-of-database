@@ -2,33 +2,43 @@ package org.example.fuzzy;
 
 import org.example.fuzzy.set.ClassicSet;
 import org.example.fuzzy.set.FuzzySet;
+import net.sourceforge.jFuzzyLogic.membership.MembershipFunction;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Utility to calculate attributes of fuzzy sets such as:
- * support, alpha-cut, normality, height.
+ * Utility to calculate attributes of fuzzy sets such as support, alpha-cut, normality, and height.
+ * Leverages jFuzzyLogic's MembershipFunction properties natively.
  */
 public class FuzzyProperties {
 
     /**
-     * Calculates height of the fuzzy set by checking a dense discretization of continuous sets
-     * or all discrete points.
+     * Calculates height of the fuzzy set.
      */
     public static double height(FuzzySet set) {
-        ClassicSet universe = set.getUniverse();
-        if (!universe.isContinuous()) {
+        MembershipFunction mf = set.getMembershipFunction();
+        if (mf.isDiscrete()) {
+            ClassicSet universe = set.getUniverse();
             double max = 0.0;
             for (double val : universe.getDiscreteElements()) {
                 max = Math.max(max, set.getMembership(val));
             }
             return max;
         } else {
-            // Discretize continuous bounds to approximate maximum height
+            mf.estimateUniverse();
+            double uMin = mf.getUniverseMin();
+            double uMax = mf.getUniverseMax();
+            
+            // Fall back to ClassicSet bounds if jFuzzyLogic bounds are uninitialized
+            if (Double.isNaN(uMin) || Double.isNaN(uMax) || (uMin == 0.0 && uMax == 0.0)) {
+                uMin = set.getUniverse().getMinBound();
+                uMax = set.getUniverse().getMaxBound();
+            }
+            
             double max = 0.0;
-            double step = (universe.getMaxBound() - universe.getMinBound()) / 1000.0;
-            for (double x = universe.getMinBound(); x <= universe.getMaxBound(); x += step) {
+            double step = (uMax - uMin) / 1000.0;
+            for (double x = uMin; x <= uMax; x += step) {
                 max = Math.max(max, set.getMembership(x));
             }
             return max;
@@ -47,22 +57,31 @@ public class FuzzyProperties {
      * Elements where membership > 0.
      */
     public static ClassicSet support(FuzzySet set) {
-        ClassicSet universe = set.getUniverse();
-        if (universe.isContinuous()) {
-            // For continuous, we approximate the boundaries where membership > 0
-            double start = universe.getMaxBound();
-            double end = universe.getMinBound();
-            double step = (universe.getMaxBound() - universe.getMinBound()) / 1000.0;
+        MembershipFunction mf = set.getMembershipFunction();
+        if (!mf.isDiscrete()) {
+            mf.estimateUniverse();
+            double uMin = mf.getUniverseMin();
+            double uMax = mf.getUniverseMax();
             
-            for (double x = universe.getMinBound(); x <= universe.getMaxBound(); x += step) {
+            if (Double.isNaN(uMin) || Double.isNaN(uMax) || (uMin == 0.0 && uMax == 0.0)) {
+                uMin = set.getUniverse().getMinBound();
+                uMax = set.getUniverse().getMaxBound();
+            }
+            
+            double start = uMax;
+            double end = uMin;
+            double step = (uMax - uMin) / 1000.0;
+            
+            for (double x = uMin; x <= uMax; x += step) {
                 if (set.getMembership(x) > 0.0) {
                     start = Math.min(start, x);
                     end = Math.max(end, x);
                 }
             }
-            if (start > end) return new ClassicSet(0, 0); // Empty support
+            if (start > end) return new ClassicSet(0, 0);
             return new ClassicSet(start, end);
         } else {
+            ClassicSet universe = set.getUniverse();
             Set<Double> elements = new HashSet<>();
             for (double val : universe.getDiscreteElements()) {
                 if (set.getMembership(val) > 0.0) {
@@ -78,21 +97,31 @@ public class FuzzyProperties {
      * Elements where membership >= alpha.
      */
     public static ClassicSet alphaCut(FuzzySet set, double alpha) {
-        ClassicSet universe = set.getUniverse();
-        if (universe.isContinuous()) {
-            double start = universe.getMaxBound();
-            double end = universe.getMinBound();
-            double step = (universe.getMaxBound() - universe.getMinBound()) / 1000.0;
+        MembershipFunction mf = set.getMembershipFunction();
+        if (!mf.isDiscrete()) {
+            mf.estimateUniverse();
+            double uMin = mf.getUniverseMin();
+            double uMax = mf.getUniverseMax();
             
-            for (double x = universe.getMinBound(); x <= universe.getMaxBound(); x += step) {
+            if (Double.isNaN(uMin) || Double.isNaN(uMax) || (uMin == 0.0 && uMax == 0.0)) {
+                uMin = set.getUniverse().getMinBound();
+                uMax = set.getUniverse().getMaxBound();
+            }
+            
+            double start = uMax;
+            double end = uMin;
+            double step = (uMax - uMin) / 1000.0;
+            
+            for (double x = uMin; x <= uMax; x += step) {
                 if (set.getMembership(x) >= alpha) {
                     start = Math.min(start, x);
                     end = Math.max(end, x);
                 }
             }
-            if (start > end) return new ClassicSet(0, 0); // Empty
+            if (start > end) return new ClassicSet(0, 0);
             return new ClassicSet(start, end);
         } else {
+            ClassicSet universe = set.getUniverse();
             Set<Double> elements = new HashSet<>();
             for (double val : universe.getDiscreteElements()) {
                 if (set.getMembership(val) >= alpha) {

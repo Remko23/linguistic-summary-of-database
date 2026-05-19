@@ -1,26 +1,23 @@
 package org.example.fuzzy.membership;
 
-/**
- * Implements a Gaussian (bell-shaped) membership function.
- * Defined by mean (center) and sigma (standard deviation).
- */
-public class GaussianMembershipFunction implements MembershipFunction {
-    private final double mean;
-    private final double sigma;
+import net.sourceforge.jFuzzyLogic.membership.MembershipFunctionGaussian;
+import net.sourceforge.jFuzzyLogic.membership.Value;
+
+public class GaussianMembershipFunction extends MembershipFunctionGaussian {
 
     public GaussianMembershipFunction(double mean, double sigma) {
-        if (sigma <= 0) {
-            throw new IllegalArgumentException("Sigma must be positive");
-        }
-        this.mean = mean;
-        this.sigma = sigma;
+        super(new Value(mean), new Value(sigma));
     }
 
-    @Override
     public double getMembership(double x) {
-        return Math.exp(-0.5 * Math.pow((x - mean) / sigma, 2));
+        return membership(x);
     }
 
-    public double getMean() { return mean; }
-    public double getSigma() { return sigma; }
+    public double getMean() {
+        return getParameter(0);
+    }
+
+    public double getSigma() {
+        return getParameter(1);
+    }
 }

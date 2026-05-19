@@ -1,5 +1,7 @@
 package org.example.fuzzy;
 
+import net.sourceforge.jFuzzyLogic.rule.Variable;
+import net.sourceforge.jFuzzyLogic.rule.LinguisticTerm;
 import org.example.fuzzy.set.FuzzySet;
 
 import java.util.HashMap;
@@ -7,16 +9,16 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Binds a specific database attribute (e.g. "age") to a set of
- * linguistic labels (e.g. "young", "middle-aged", "elderly").
+ * Binds a specific database attribute to a set of linguistic labels
  * Each label maps to a corresponding FuzzySet definition.
+ * Internally wraps jFuzzyLogic's Variable and LinguisticTerm classes.
  */
 public class LinguisticVariable {
-    private final String attributeName;
+    private final Variable internalVariable;
     private final Map<String, FuzzySet> labels;
 
     public LinguisticVariable(String attributeName) {
-        this.attributeName = attributeName;
+        this.internalVariable = new Variable(attributeName);
         this.labels = new HashMap<>();
     }
 
@@ -25,10 +27,12 @@ public class LinguisticVariable {
      */
     public void addLabel(String labelName, FuzzySet set) {
         labels.put(labelName, set);
+        LinguisticTerm term = new LinguisticTerm(labelName, set.getMembershipFunction());
+        internalVariable.add(term);
     }
 
     public String getAttributeName() {
-        return attributeName;
+        return internalVariable.getName();
     }
 
     public FuzzySet getLabelSet(String labelName) {
@@ -41,5 +45,9 @@ public class LinguisticVariable {
 
     public Map<String, FuzzySet> getLabelsMap() {
         return new HashMap<>(labels);
+    }
+
+    public Variable getInternalVariable() {
+        return internalVariable;
     }
 }
