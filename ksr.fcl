@@ -1,0 +1,92 @@
+FUNCTION_BLOCK ocena_artykulow
+
+VAR_INPUT
+    a_r : REAL;
+    a_h : REAL;
+    t_r : REAL;
+    w_l : REAL;
+    a_s : REAL;
+    a_e : REAL;
+    t_s : REAL;
+    t_e : REAL;
+    p : REAL;
+    s : REAL;
+END_VAR
+
+// 1. Atrakcyjność wizualna
+FUZZIFY a_r
+    TERM surowa := (0, 1) (10, 1) (14, 0);
+    TERM zbalansowana := (12, 0) (15, 1) (20, 1) (30, 0);
+    TERM atrakcyjna := (25, 0) (45, 1) (128, 1);
+END_FUZZIFY
+
+// 2. Bogactwo źródeł
+FUZZIFY a_h
+    TERM ubogie := (0, 1) (8, 1) (12, 0);
+    TERM srednie := (10, 0) (14, 1) (20, 1) (25, 0);
+    TERM bogate := (23, 0) (40, 1) (304, 1);
+END_FUZZIFY
+
+// 3. Unikalność słów artykułu
+FUZZIFY t_r
+    TERM pospolity := (0.11, 1) (0.2, 1) (0.35, 0);
+    TERM sredni := (0.3, 0) (0.5, 1) (0.65, 1) (0.75, 0);
+    TERM unikalny := (0.6, 0) (0.8, 1) (1, 1);
+END_FUZZIFY
+
+// 4. Średnia długość słowa
+FUZZIFY w_l
+    TERM mala := (3.6, 1) (4.4, 1) (5, 0);
+    TERM srednia := (4.1, 0) (5.2, 1) (6.1, 1) (6.5, 0);
+    TERM duza := (6.3, 0) (7.1, 1) (8.04, 1);
+END_FUZZIFY
+
+// 5. Współczynnik subiektywności artykułu
+FUZZIFY a_s
+    TERM bardzo_obiektywny := (0, 1) (0.15, 1) (0.25, 0);
+    TERM obiektywny := (0.2, 0) (0.35, 1) (0.45, 1) (0.55, 0);
+    TERM subiektywny := (0.45, 0) (0.55, 1) (0.65, 1) (0.8, 0);
+    TERM bardzo_subiektywny := (0.75, 0) (0.85, 1) (1, 1);
+END_FUZZIFY
+
+// 6. Współczynnik nacechowania emocjonalnego artykułu
+FUZZIFY a_e
+    TERM bardzo_negatywny := (-0.39, 1) (-0.25, 1) (-0.2, 0);
+    TERM negatywny := (-0.25, 0) (-0.1, 1) (0, 1) (0.1, 0);
+    TERM neutralny := (0, 0) (0.1, 1) (0.25, 1) (0.4, 0);
+    TERM pozytywny := (0.3, 0) (0.4, 1) (0.55, 1) (0.65, 0);
+    TERM bardzo_pozytywny := (0.55, 0) (0.65, 1) (0.73, 1);
+END_FUZZIFY
+
+// 7. Współczynnik subiektywności tytułu
+FUZZIFY t_s
+    TERM bardzo_obiektywny := (0, 1) (0.15, 1) (0.2, 0);
+    TERM obiektywny := (0.15, 0) (0.25, 1) (0.4, 1) (0.6, 0);
+    TERM subiektywny := (0.4, 0) (0.6, 1) (0.75, 1) (0.85, 0);
+    TERM bardzo_subiektywny := (0.8, 0) (0.85, 1) (1, 1);
+END_FUZZIFY
+
+// 8. Współczynnik nacechowania emocjonalnego tytułu
+FUZZIFY t_e
+    TERM negatywny := (-1, 1) (-0.6, 1) (0.25, 0);
+    TERM neutralny := (-0.5, 0) (-0.25, 1) (0.25, 1) (0.5, 0);
+    TERM pozytywny := (0.25, 0) (0.6, 1) (1, 1);
+END_FUZZIFY
+
+// 9. Stosunek pozytywnych słów
+FUZZIFY p
+    TERM niski := (0, 1) (0.25, 1) (0.4, 0);
+    TERM sredni := (0.25, 0) (0.4, 1) (0.6, 1) (0.75, 0);
+    TERM wysoki := (0.6, 0) (0.75, 1) (1, 1);
+END_FUZZIFY
+
+// 10. Popularność artykułu
+FUZZIFY s
+    TERM bardzo_niszowy := (1, 1) (15, 1) (50, 0);
+    TERM niszowy := (20, 0) (40, 1) (100, 1) (150, 0);
+    TERM sredni := (175, 0) (1800, 1) (5500, 1) (7000, 0);
+    TERM popularny := (6500, 0) (15000, 1) (25000, 1) (55000, 0);
+    TERM bardzo_popularny := (50000, 0) (100000, 1) (843300, 1);
+END_FUZZIFY
+
+END_FUNCTION_BLOCK
