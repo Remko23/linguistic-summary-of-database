@@ -98,7 +98,7 @@ END_FUZZIFY
 
 // Kwantyfikatory względne
 FUZZIFY kwantyfikator_wzgledny
-    TERM prawie_nic := (0, 1) (0.05, 1) (0.15, 0);
+    TERM prawie_zaden := (0, 1) (0.05, 1) (0.15, 0);
     TERM okolo_1_4 := (0.10, 0) (0.20, 1) (0.30, 1) (0.40, 0);
     TERM okolo_polowy := (0.35, 0) (0.45, 1) (0.55, 1) (0.65, 0);
     TERM okolo_3_4 := (0.60, 0) (0.70, 1) (0.80, 1) (0.90, 0);

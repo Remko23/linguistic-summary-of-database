@@ -12,9 +12,6 @@ public class FuzzySet {
         this.membershipFunction = membershipFunction;
     }
 
-    /**
-     * Gets membership value, ensuring it stays within the universe limits.
-     */
     public double getMembership(double x) {
         if (!universe.contains(x)) {
             return 0.0;
@@ -22,9 +19,6 @@ public class FuzzySet {
         return membershipFunction.membership(x);
     }
 
-    /**
-     * Performs standard fuzzy union (using Zadeh's max T-conorm).
-     */
     public FuzzySet union(FuzzySet other) {
         return new FuzzySet(this.universe, new MembershipFunctionContinuous() {
             @Override
@@ -40,9 +34,6 @@ public class FuzzySet {
         });
     }
 
-    /**
-     * Performs standard fuzzy intersection (using Zadeh's min T-norm).
-     */
     public FuzzySet intersect(FuzzySet other) {
         return new FuzzySet(this.universe, new MembershipFunctionContinuous() {
             @Override
@@ -58,9 +49,6 @@ public class FuzzySet {
         });
     }
 
-    /**
-     * Performs standard fuzzy complement.
-     */
     public FuzzySet complement() {
         return new FuzzySet(this.universe, new MembershipFunctionContinuous() {
             @Override

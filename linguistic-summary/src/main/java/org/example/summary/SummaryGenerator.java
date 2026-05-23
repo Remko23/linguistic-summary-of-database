@@ -9,101 +9,38 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Generator engine combining database records, fuzzy quantifiers,
- * qualifiers, and summarizers to produce candidate linguistic summaries.
- */
 public class SummaryGenerator {
 
-    /**
-     * Generates a list of single-subject linguistic summaries.
-     * Combines all quantifiers, optional qualifiers, and summarizers.
-     */
     public List<LinguisticSummaryDTO> generateSingleSubject(
             List<DataEntity> records,
             List<Quantifier> quantifiers,
-            List<FuzzySet> qualifiers,
-            List<LinguisticVariable> summarizers) {
+            List<FuzzyStatement> qualifiers,
+            List<FuzzyStatement> summarizers) {
 
         List<LinguisticSummaryDTO> results = new ArrayList<>();
 
         for (Quantifier q : quantifiers) {
-            // Generuje z kwalifikatorami oraz bez (kwalifikator = null)
-            List<FuzzySet> activeQualifiers = new ArrayList<>(qualifiers);
+            List<FuzzyStatement> activeQualifiers = new ArrayList<>(qualifiers);
             activeQualifiers.add(null);
 
-            for (FuzzySet qual : activeQualifiers) {
-                for (LinguisticVariable sumVar : summarizers) {
-                    for (String label : sumVar.getLabels()) {
-                        FuzzySet sumSet = sumVar.getLabelSet(label);
-                        List<FuzzySet> sumList = Collections.singletonList(sumSet);
+            for (FuzzyStatement qual : activeQualifiers) {
+                for (FuzzyStatement sumVar : summarizers) {
+                    List<FuzzyStatement> sumList = Collections.singletonList(sumVar);
 
-                        // Budowanie zdania
-                        String text = buildSentence(q.getName(), qual, sumVar.getAttributeName(), label);
-                        LinguisticSummaryDTO dto = new LinguisticSummaryDTO(text);
-
-                        // Obliczanie miar jakości T1 - T11
-                        dto.setMeasure(1, QualityEvaluator.evaluateT1(records, q, qual, sumList));
-                        dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
-                        dto.setMeasure(3, QualityEvaluator.evaluateT3(records, qual, sumList));
-                        dto.setMeasure(4, QualityEvaluator.evaluateT4(sumList));
-                        dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
-                        dto.setMeasure(6, QualityEvaluator.evaluateT6(q));
-                        dto.setMeasure(7, QualityEvaluator.evaluateT7(q));
-                        dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
-                        dto.setMeasure(9, QualityEvaluator.evaluateT9(sumList));
-                        dto.setMeasure(10, QualityEvaluator.evaluateT10(qual));
-                        dto.setMeasure(11, QualityEvaluator.evaluateT11(qual));
-
-                        results.add(dto);
-                    }
-                }
-            }
-        }
-        return results;
-    }
-
-    /**
-     * Generates multi-subject summaries comparing two different target groups.
-     * E.g. "More young clients than older clients have high incomes".
-     */
-    public List<LinguisticSummaryDTO> generateMultiSubject(
-            List<DataEntity> group1,
-            List<DataEntity> group2,
-            String group1Name,
-            String group2Name,
-            List<Quantifier> quantifiers,
-            List<LinguisticVariable> summarizers) {
-
-        List<LinguisticSummaryDTO> results = new ArrayList<>();
-
-        for (Quantifier q : quantifiers) {
-            for (LinguisticVariable sumVar : summarizers) {
-                for (String label : sumVar.getLabels()) {
-                    FuzzySet sumSet = sumVar.getLabelSet(label);
-                    List<FuzzySet> sumList = Collections.singletonList(sumSet);
-
-                    // Multi-subject comparison text
-                    String text = String.format("%s clients from group %s compared to %s are having attribute %s: %s",
-                            q.getName(), group1Name, group2Name, sumVar.getAttributeName(), label);
-                    
+                    String text = buildSentence(q.getName(), qual, sumVar);
                     LinguisticSummaryDTO dto = new LinguisticSummaryDTO(text);
 
-                    // Compute basic truth values for comparative set evaluations
-                    double t1 = QualityEvaluator.evaluateT1(group1, q, null, sumList);
-                    double t2 = QualityEvaluator.evaluateT1(group2, q, null, sumList);
-
-                    dto.setMeasure(1, Math.max(t1, t2));
+                    dto.setMeasure(1, QualityEvaluator.evaluateT1(records, q, qual, sumList));
                     dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
-                    dto.setMeasure(3, 0.5); // Default placeholder metric for complex multi-subject properties
+                    dto.setMeasure(3, QualityEvaluator.evaluateT3(records, qual, sumList));
                     dto.setMeasure(4, QualityEvaluator.evaluateT4(sumList));
                     dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
                     dto.setMeasure(6, QualityEvaluator.evaluateT6(q));
                     dto.setMeasure(7, QualityEvaluator.evaluateT7(q));
                     dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
                     dto.setMeasure(9, QualityEvaluator.evaluateT9(sumList));
-                    dto.setMeasure(10, 0.0);
-                    dto.setMeasure(11, 0.0);
+                    dto.setMeasure(10, QualityEvaluator.evaluateT10(qual));
+                    dto.setMeasure(11, QualityEvaluator.evaluateT11(qual));
 
                     results.add(dto);
                 }
@@ -112,14 +49,78 @@ public class SummaryGenerator {
         return results;
     }
 
-    // Helper: forms linguistic sentence templates
-    private String buildSentence(String quantifier, FuzzySet qualifier, String attribute, String label) {
+    public List<LinguisticSummaryDTO> generateMultiSubject(
+            List<DataEntity> group1,
+            List<DataEntity> group2,
+            String group1Name,
+            String group2Name,
+            List<Quantifier> quantifiers,
+            List<FuzzyStatement> summarizers) {
+
+        List<LinguisticSummaryDTO> results = new ArrayList<>();
+
+        for (Quantifier q : quantifiers) {
+            for (FuzzyStatement sumVar : summarizers) {
+                List<FuzzyStatement> sumList = Collections.singletonList(sumVar);
+
+                String text = String.format("%s artykułów z grupy %s w porównaniu do %s ma %s %s",
+                        q.getName().replace("_", " "), group1Name, group2Name, mapAttributeName(sumVar.getAttributeName()), sumVar.getLabel().replace("_", " "));
+                
+                LinguisticSummaryDTO dto = new LinguisticSummaryDTO(text);
+
+                double t1 = QualityEvaluator.evaluateT1(group1, q, null, sumList);
+                double t2 = QualityEvaluator.evaluateT1(group2, q, null, sumList);
+
+                dto.setMeasure(1, Math.max(t1, t2));
+                dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
+                dto.setMeasure(3, 0.5);
+                dto.setMeasure(4, QualityEvaluator.evaluateT4(sumList));
+                dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
+                dto.setMeasure(6, QualityEvaluator.evaluateT6(q));
+                dto.setMeasure(7, QualityEvaluator.evaluateT7(q));
+                dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
+                dto.setMeasure(9, QualityEvaluator.evaluateT9(sumList));
+                dto.setMeasure(10, 0.0);
+                dto.setMeasure(11, 0.0);
+
+                results.add(dto);
+            }
+        }
+        return results;
+    }
+
+    private String buildSentence(String quantifier, FuzzyStatement qualifier, FuzzyStatement summarizer) {
+        // Zmiana podkreśleń na spacje, zaczynamy zdanie wielką literą dla kwantyfikatora
+        String qName = quantifier.replace("_", " ");
+        qName = qName.substring(0, 1).toUpperCase() + qName.substring(1);
+        
+        String sumAttr = mapAttributeName(summarizer.getAttributeName());
+        String sumLabel = summarizer.getLabel().replace("_", " ");
+
         if (qualifier == null) {
-            return String.format("%s of database records have attribute %s: %s.", 
-                    quantifier, attribute, label);
+            return String.format("%s artykułów ma %s %s.", 
+                    qName, sumAttr, sumLabel);
         } else {
-            return String.format("%s of database records who are qualifying as matching requirements have attribute %s: %s.",
-                    quantifier, attribute, label);
+            String qualAttr = mapAttributeName(qualifier.getAttributeName());
+            String qualLabel = qualifier.getLabel().replace("_", " ");
+            return String.format("%s artykułów mających %s %s ma %s %s.",
+                    qName, qualAttr, qualLabel, sumAttr, sumLabel);
+        }
+    }
+
+    private String mapAttributeName(String fclName) {
+        switch (fclName) {
+            case "a_r": return "atrakcyjność wizualna";
+            case "a_h": return "bogactwo źródeł";
+            case "t_r": return "unikalność słów artykułu";
+            case "w_l": return "średnia długość słowa";
+            case "a_s": return "współczynnik subiektywności artykułu";
+            case "a_e": return "współczynnik nacechowania emocjonalnego artykułu";
+            case "t_s": return "współczynnik subiektywności tytułu";
+            case "t_e": return "współczynnik nacechowania emocjonalnego tytułu";
+            case "p": return "stosunek pozytywnych słów";
+            case "s": return "popularność artykułu";
+            default: return fclName;
         }
     }
 }

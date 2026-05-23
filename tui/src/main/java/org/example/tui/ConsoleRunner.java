@@ -10,15 +10,12 @@ import org.example.fuzzy.quantifier.Quantifier;
 import org.example.fuzzy.quantifier.RelativeQuantifier;
 import org.example.fuzzy.set.FuzzySet;
 import org.example.summary.LinguisticSummaryDTO;
+import org.example.summary.FuzzyStatement;
 import org.example.summary.OptimalSummaryOptimizer;
 import org.example.summary.SummaryGenerator;
 
 import java.util.*;
 
-/**
- * Handles terminal commands to trigger test scenarios, loading records
- * and evaluating summaries interactively without starting the JavaFX GUI.
- */
 public class ConsoleRunner {
     private final RecordRepository repository;
     private final SummaryGenerator generator;
@@ -31,27 +28,75 @@ public class ConsoleRunner {
     }
 
     public void start() {
-        System.out.println("==================================================");
-        System.out.println("      KSR Linguistic Summary - TUI MainMenu       ");
-        System.out.println("==================================================");
-        System.out.println("Available commands: 'test' 'exit'");
+        System.out.println("KSR Podsumowania Lingwistyczne");
+        System.out.println("Komendy: 'test' 'exit'");
 
         while (true) {
-            System.out.print("\nKSR-TUI> ");
+            System.out.print("\nKSR> ");
             String cmd = scanner.nextLine().trim().toLowerCase();
 
             if (cmd.equals("exit")) {
-                System.out.println("Exiting Console Runner...");
+                System.out.println("Wyłączanie...");
                 break;
             } else if (cmd.equals("test")) {
                 test();
             } else {
-                System.out.println("Unknown command: '" + cmd + "'. Try 'test' or 'exit'.");
+                System.out.println("Nieznana komenda: '" + cmd + "'. Wpisz 'test' lub 'exit'.");
             }
         }
     }
 
     private void test() {
-        System.out.println("yo");
+        List<DataEntity> records = repository.getAllRecords();
+        if (records.isEmpty()) {
+            System.out.println("Brak rekordów.");
+            return;
+        }
+        System.out.println("Załadowano " + records.size() + " rekordów.");
+
+        System.out.println("Ładowanie zmiennych lingwistycznych z pliku FCL...");
+        List<LinguisticVariable> allVars = org.example.fuzzy.FclLoader.loadLinguisticVariables("ksr.fcl");
+        
+        List<FuzzyStatement> summarizers = new ArrayList<>();
+        List<Quantifier> quantifiers = new ArrayList<>();
+        List<FuzzyStatement> qualifiers = new ArrayList<>();
+
+        for (LinguisticVariable var : allVars) {
+            String name = var.getAttributeName();
+            if (name.equals("kwantyfikator_wzgledny")) {
+                for (String label : var.getLabels()) {
+                    quantifiers.add(new RelativeQuantifier(label, var.getLabelSet(label)));
+                }
+            } else if (name.equals("kwantyfikator_bezwzgledny")) {
+                for (String label : var.getLabels()) {
+                    quantifiers.add(new org.example.fuzzy.quantifier.AbsoluteQuantifier(label, var.getLabelSet(label)));
+                }
+            } else {
+                for (String label : var.getLabels()) {
+                    FuzzyStatement stmt = new FuzzyStatement(name, label, var.getLabelSet(label));
+                    summarizers.add(stmt);
+                    
+                    if (name.equals("a_s") && label.equals("subiektywny")) {
+                        qualifiers.add(stmt);
+                    }
+                }
+            }
+        }
+
+        List<FuzzyStatement> activeSummarizers = new ArrayList<>();
+        for (FuzzyStatement var : summarizers) {
+            if (var.getAttributeName().equals("s") || var.getAttributeName().equals("a_s")) {
+                activeSummarizers.add(var);
+            }
+        }
+
+        System.out.println("Generowanie podsumowan...");
+        List<LinguisticSummaryDTO> summaries = generator.generateSingleSubject(records, quantifiers, qualifiers, activeSummarizers);
+        
+        summaries.sort((s1, s2) -> Double.compare(s2.getMeasure(1), s1.getMeasure(1)));
+        List<LinguisticSummaryDTO> topSummaries = summaries.size() > 20 ? summaries.subList(0, 20) : summaries;
+
+        ResultPrinter.printResults(topSummaries);
+        ResultPrinter.saveToFile(topSummaries, "wyniki_podsumowan.txt");
     }
 }
