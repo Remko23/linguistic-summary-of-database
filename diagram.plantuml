@@ -20,35 +20,7 @@ class ClassicSet {
    minBound: double
    isContinuous: boolean
 }
-class ConsoleRunner {
-  + ConsoleRunner(): 
-  + start(): void
-  - runDemoScenario(): void
-}
-class DataEntity {
-  + DataEntity(int, String): 
-  - label: String
-  - id: int
-  - numericAttributes: Map<String, Double>
-  + getAttribute(String): Double
-  + addAttribute(String, double): void
-  + toString(): String
-   numericAttributes: Map<String, Double>
-   id: int
-   label: String
-}
-class DbConnectionManager {
-  + DbConnectionManager(): 
-  + shutdown(): void
-   connection: Connection
-}
-class FuzzyProperties {
-  + FuzzyProperties(): 
-  + height(FuzzySet): double
-  + isNormal(FuzzySet): boolean
-  + support(FuzzySet): ClassicSet
-  + alphaCut(FuzzySet, double): ClassicSet
-}
+
 class FuzzySet {
   + FuzzySet(ClassicSet, MembershipFunction): 
   - membershipFunction: MembershipFunction
@@ -67,16 +39,6 @@ class GaussianMembershipFunction {
   + getMembership(double): double
    mean: double
    sigma: double
-}
-class JdbcRecordRepository {
-  + JdbcRecordRepository(): 
-  - generateMockData(): List<DataEntity>
-  + getRecordsByCriteria(String): List<DataEntity>
-   allRecords: List<DataEntity>
-}
-class Launcher {
-  + Launcher(): 
-  + main(String[]): void
 }
 class LinguisticSummaryDTO {
   + LinguisticSummaryDTO(String): 
@@ -99,21 +61,6 @@ class LinguisticVariable {
    labelsMap: Map<String, FuzzySet>
    attributeName: String
    labels: Set<String>
-}
-class Main {
-  + Main(): 
-  + main(String[]): void
-  + start(Stage): void
-}
-class Main {
-  + Main(): 
-  + main(String[]): void
-}
-class MainWindowController {
-  + MainWindowController(): 
-  - handleHelloAction(ActionEvent): void
-  + initialize(): void
-  - handleGenerateAction(ActionEvent): void
 }
 interface MembershipFunction << interface >> {
   + getMembership(double): double
@@ -147,17 +94,17 @@ class Quantifier {
    name: String
    fuzzySet: FuzzySet
 }
-interface RecordRepository << interface >> {
-  + getRecordsByCriteria(String): List<DataEntity>
-   allRecords: List<DataEntity>
-}
 class RelativeQuantifier {
   + RelativeQuantifier(String, FuzzySet): 
 }
-class ResultPrinter {
-  + ResultPrinter(): 
-  + printResults(List<LinguisticSummaryDTO>): void
-  - truncate(String, int): String
+class FuzzyStatement {
+  + FuzzyStatement(String, String, FuzzySet): 
+  - attributeName: String
+  - label: String
+  - fuzzySet: FuzzySet
+  + getAttributeName(): String
+  + getLabel(): String
+  + getFuzzySet(): FuzzySet
 }
 class SubjectPartitioner {
   + SubjectPartitioner(): 
@@ -193,10 +140,26 @@ class TriangularMembershipFunction {
    a: double
 }
 
-AbsoluteQuantifier             -[#000082,plain]-^  Quantifier                    
-GaussianMembershipFunction     -[#008200,dashed]-^  MembershipFunction            
-JdbcRecordRepository           -[#008200,dashed]-^  RecordRepository              
-RelativeQuantifier             -[#000082,plain]-^  Quantifier                    
-TrapezoidalMembershipFunction  -[#008200,dashed]-^  MembershipFunction            
-TriangularMembershipFunction   -[#008200,dashed]-^  MembershipFunction            
+AbsoluteQuantifier             -[#000082,plain]-^  Quantifier
+GaussianMembershipFunction     -[#008200,dashed]-^  MembershipFunction
+RelativeQuantifier             -[#000082,plain]-^  Quantifier
+TrapezoidalMembershipFunction  -[#008200,dashed]-^  MembershipFunction
+TriangularMembershipFunction   -[#008200,dashed]-^  MembershipFunction
+
+FuzzySet               *--  ClassicSet              : universe
+FuzzySet               *--  MembershipFunction      : membershipFunction
+Quantifier             *--  FuzzySet                : fuzzySet
+LinguisticVariable     o--  FuzzySet                : labels *
+
+FuzzyStatement         *--  FuzzySet                : fuzzySet
+
+SummaryGenerator       ..>  Quantifier              : «uses»
+SummaryGenerator       ..>  FuzzyStatement           : «uses»
+SummaryGenerator       ..>  LinguisticSummaryDTO    : «creates»
+SummaryGenerator       ..>  QualityEvaluator        : «calls»
+QualityEvaluator       ..>  Quantifier              : «uses»
+QualityEvaluator       ..>  FuzzyStatement           : «uses»
+QualityEvaluator       ..>  FuzzySet                : «uses»
+OptimalSummaryOptimizer ..> LinguisticSummaryDTO    : «ranks»
+
 @enduml
