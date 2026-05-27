@@ -16,16 +16,14 @@ public class ResultPrinter {
             maxLen = Math.max(maxLen, dto.getSummaryText().length());
         }
 
-        String separator = "-".repeat(maxLen + 38);
+        String header = buildHeader(maxLen);
+        String separator = "-".repeat(header.length());
+
         System.out.println(separator);
-        System.out.printf("| %-" + maxLen + "s | %-10s | %-8s | %-8s |\n", "Summary Text", "Score", "T1", "T2");
+        System.out.println(header);
         System.out.println(separator);
         for (LinguisticSummaryDTO dto : results) {
-            System.out.printf("| %-" + maxLen + "s | %-10.4f | %-8.4f | %-8.4f |\n",
-                    dto.getSummaryText(),
-                    dto.getOverallScore(),
-                    dto.getMeasure(1),
-                    dto.getMeasure(2));
+            System.out.println(buildRow(dto, maxLen));
         }
         System.out.println(separator);
     }
@@ -39,21 +37,39 @@ public class ResultPrinter {
                 maxLen = Math.max(maxLen, dto.getSummaryText().length());
             }
 
-            String separator = "-".repeat(maxLen + 38);
+            String header = buildHeader(maxLen);
+            String separator = "-".repeat(header.length());
+
             out.println(separator);
-            out.printf("| %-" + maxLen + "s | %-10s | %-8s | %-8s |\n", "Summary Text", "Score", "T1", "T2");
+            out.println(header);
             out.println(separator);
             for (LinguisticSummaryDTO dto : results) {
-                out.printf("| %-" + maxLen + "s | %-10.4f | %-8.4f | %-8.4f |\n",
-                        dto.getSummaryText(),
-                        dto.getOverallScore(),
-                        dto.getMeasure(1),
-                        dto.getMeasure(2));
+                out.println(buildRow(dto, maxLen));
             }
             out.println(separator);
             System.out.println("Wyniki pomyślnie zapisano do pliku: " + filename);
         } catch (java.io.IOException e) {
             System.err.println("Błąd podczas zapisywania do pliku: " + e.getMessage());
         }
+    }
+
+    private static String buildHeader(int maxLen) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("| %-" + maxLen + "s | %-8s ", "Podsumowanie", "T"));
+        for (int i = 1; i <= 11; i++) {
+            sb.append(String.format("| %-6s ", "T" + i));
+        }
+        sb.append("|");
+        return sb.toString();
+    }
+
+    private static String buildRow(LinguisticSummaryDTO dto, int maxLen) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("| %-" + maxLen + "s | %-8.4f ", dto.getSummaryText(), dto.getOverallScore()));
+        for (int i = 1; i <= 11; i++) {
+            sb.append(String.format("| %-6.4f ", dto.getMeasure(i)));
+        }
+        sb.append("|");
+        return sb.toString();
     }
 }

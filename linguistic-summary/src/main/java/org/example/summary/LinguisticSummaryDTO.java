@@ -48,7 +48,12 @@ public class LinguisticSummaryDTO {
 
     @Override
     public String toString() {
-        return String.format("Summary: \"%s\" (Score: %.4f, T1: %.2f, T2: %.2f)", 
-                summaryText, overallScore, getMeasure(1), getMeasure(2));
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Summary: \"%s\" (T=%.4f", summaryText, overallScore));
+        for (int i = 1; i <= 11; i++) {
+            sb.append(String.format(", T%d=%.4f", i, getMeasure(i)));
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }

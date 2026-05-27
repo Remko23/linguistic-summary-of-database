@@ -59,47 +59,61 @@ public class QualityEvaluator {
         return countD == 0 ? 0.0 : countH / countD;
     }
 
-    public static double evaluateT4(List<FuzzyStatement> summarizers) {
+    // T4: |Π r_j - T3|, gdzie r_j = |supp(S_j) ∩ D| / |D|
+    public static double evaluateT4(List<DataEntity> records, FuzzyStatement qualifier, List<FuzzyStatement> summarizers) {
+        double t3 = evaluateT3(records, qualifier, summarizers);
+
         double product = 1.0;
         for (FuzzyStatement sum : summarizers) {
-            product *= (1.0 - degreeOfImprecision(sum.getFuzzySet()));
+            double suppCount = 0.0;
+            for (DataEntity record : records) {
+                if (evaluateSingleMembership(record, sum) > 0.0) {
+                    suppCount++;
+                }
+            }
+            double rj = records.isEmpty() ? 0.0 : suppCount / records.size();
+            product *= rj;
         }
-        return Math.pow(product, 1.0 / summarizers.size());
+
+        return Math.abs(product - t3);
     }
 
     public static double evaluateT5(List<FuzzyStatement> summarizers) {
         return 2.0 * Math.pow(0.5, summarizers.size());
     }
 
+    // T6: 1 - |supp(Q)| / |X_Q|
     public static double evaluateT6(Quantifier quantifier) {
         return 1.0 - degreeOfImprecision(quantifier.getFuzzySet());
     }
 
+    // T7: 1 - rc(Q), gdzie rc = relative cardinality
     public static double evaluateT7(Quantifier quantifier) {
-        return degreeOfImprecision(quantifier.getFuzzySet());
+        return 1.0 - relativeCardinality(quantifier.getFuzzySet());
     }
 
+    // T8: 1 - (Π rc(S_j))^{1/n}
     public static double evaluateT8(List<FuzzyStatement> summarizers) {
-        double sum = 0.0;
-        for (FuzzyStatement s : summarizers) {
-            sum += degreeOfImprecision(s.getFuzzySet());
-        }
-        return 1.0 - (sum / summarizers.size());
-    }
-
-    public static double evaluateT9(List<FuzzyStatement> summarizers) {
         double product = 1.0;
         for (FuzzyStatement s : summarizers) {
-            product *= degreeOfImprecision(s.getFuzzySet());
+            product *= relativeCardinality(s.getFuzzySet());
         }
-        return Math.pow(product, 1.0 / summarizers.size());
+        return 1.0 - Math.pow(product, 1.0 / summarizers.size());
     }
 
-    public static double evaluateT10(FuzzyStatement qualifier) {
+    // T9: 1 - in(W) (stopień nieprecyzyjności kwalifikatora)
+    public static double evaluateT9(FuzzyStatement qualifier) {
         if (qualifier == null) return 0.0;
         return 1.0 - degreeOfImprecision(qualifier.getFuzzySet());
     }
 
+    // T10: 1 - rc(W) (stopień kardynalności kwalifikatora)
+    public static double evaluateT10(FuzzyStatement qualifier) {
+        if (qualifier == null) return 0.0;
+        return 1.0 - relativeCardinality(qualifier.getFuzzySet());
+    }
+
+    // T11: in(W) — dodatkowa miara (brak w pliku md)
     public static double evaluateT11(FuzzyStatement qualifier) {
         if (qualifier == null) return 0.0;
         return degreeOfImprecision(qualifier.getFuzzySet());
@@ -125,6 +139,11 @@ public class QualityEvaluator {
         return 0.0;
     }
 
+    /**
+     * Stopień nieprecyzyjności (degree of imprecision) — in(S).
+     * Dla zbiorów ciągłych: |supp(S)| / |X| (długość nośnika / długość uniwersum).
+     * Dla zbiorów dyskretnych: |{x : µ(x) > 0}| / |X|.
+     */
     private static double degreeOfImprecision(FuzzySet set) {
         if (set.getUniverse().isContinuous()) {
             double uLen = set.getUniverse().getMaxBound() - set.getUniverse().getMinBound();
@@ -154,6 +173,36 @@ public class QualityEvaluator {
                 }
             }
             return supCount / uLen;
+        }
+    }
+
+    /**
+     * Relative cardinality — rc(S) = (Σ µ(x)) / |X|.
+     * Suma stopni przynależności podzielona przez rozmiar uniwersum.
+     */
+    private static double relativeCardinality(FuzzySet set) {
+        if (set.getUniverse().isContinuous()) {
+            double uLen = set.getUniverse().getMaxBound() - set.getUniverse().getMinBound();
+            if (uLen <= 0.0) return 0.0;
+
+            int steps = 500;
+            double step = uLen / steps;
+            double sumMembership = 0.0;
+
+            for (double x = set.getUniverse().getMinBound(); x <= set.getUniverse().getMaxBound(); x += step) {
+                sumMembership += set.getMembership(x);
+            }
+            // Normalizacja: średnia wartość przynależności ≈ (Σ µ) / (steps+1)
+            // rc = pole pod krzywą µ / długość uniwersum ≈ (Σ µ * step) / uLen = (Σ µ) / (steps+1)
+            return sumMembership / (steps + 1);
+        } else {
+            double uLen = set.getUniverse().getDiscreteElements().size();
+            if (uLen == 0.0) return 0.0;
+            double sumMembership = 0.0;
+            for (double val : set.getUniverse().getDiscreteElements()) {
+                sumMembership += set.getMembership(val);
+            }
+            return sumMembership / uLen;
         }
     }
 }

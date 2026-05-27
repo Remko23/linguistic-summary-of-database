@@ -92,8 +92,13 @@ public class ConsoleRunner {
 
         System.out.println("Generowanie podsumowan...");
         List<LinguisticSummaryDTO> summaries = generator.generateSingleSubject(records, quantifiers, qualifiers, activeSummarizers);
-        
-        summaries.sort((s1, s2) -> Double.compare(s2.getMeasure(1), s1.getMeasure(1)));
+
+        Map<Integer, Double> weights = new HashMap<>();
+        for (int i = 1; i <= 11; i++) {
+            weights.put(i, 1.0);
+        }
+        summaries = OptimalSummaryOptimizer.optimize(summaries, weights);
+
         List<LinguisticSummaryDTO> topSummaries = summaries.size() > 20 ? summaries.subList(0, 20) : summaries;
 
         ResultPrinter.printResults(topSummaries);

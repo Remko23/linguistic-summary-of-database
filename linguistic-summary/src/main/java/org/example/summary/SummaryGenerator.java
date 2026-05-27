@@ -33,12 +33,12 @@ public class SummaryGenerator {
                     dto.setMeasure(1, QualityEvaluator.evaluateT1(records, q, qual, sumList));
                     dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
                     dto.setMeasure(3, QualityEvaluator.evaluateT3(records, qual, sumList));
-                    dto.setMeasure(4, QualityEvaluator.evaluateT4(sumList));
+                    dto.setMeasure(4, QualityEvaluator.evaluateT4(records, qual, sumList));
                     dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
                     dto.setMeasure(6, QualityEvaluator.evaluateT6(q));
                     dto.setMeasure(7, QualityEvaluator.evaluateT7(q));
                     dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
-                    dto.setMeasure(9, QualityEvaluator.evaluateT9(sumList));
+                    dto.setMeasure(9, QualityEvaluator.evaluateT9(qual));
                     dto.setMeasure(10, QualityEvaluator.evaluateT10(qual));
                     dto.setMeasure(11, QualityEvaluator.evaluateT11(qual));
 
@@ -74,12 +74,12 @@ public class SummaryGenerator {
                 dto.setMeasure(1, Math.max(t1, t2));
                 dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
                 dto.setMeasure(3, 0.5);
-                dto.setMeasure(4, QualityEvaluator.evaluateT4(sumList));
+                dto.setMeasure(4, QualityEvaluator.evaluateT4(group1, null, sumList));
                 dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
                 dto.setMeasure(6, QualityEvaluator.evaluateT6(q));
                 dto.setMeasure(7, QualityEvaluator.evaluateT7(q));
                 dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
-                dto.setMeasure(9, QualityEvaluator.evaluateT9(sumList));
+                dto.setMeasure(9, 0.0);
                 dto.setMeasure(10, 0.0);
                 dto.setMeasure(11, 0.0);
 
