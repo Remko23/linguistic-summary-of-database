@@ -1,77 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.gui.MainWindowController">
+<VBox prefHeight="800.0" prefWidth="1200.0"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.gui.MainWindowController"
+      stylesheets="@styles.css">
   <children>
-    <SplitPane dividerPositions="0.3" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+
+    <ToolBar styleClass="tool-bar">
       <items>
-        <AnchorPane style="-fx-background-color: #f4f4f4;">
-          <children>
-            <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <padding>
-                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-              </padding>
-              <children>
-                <Label text="Configuration Panel">
-                  <font>
-                    <Font name="System Bold" size="14.0" />
-                  </font>
-                </Label>
-                <Separator />
-                
-                <Label text="Weight of T1 (Truth)" />
-                <Slider fx:id="t1WeightSlider" max="1.0" min="0.0" value="0.5" showTickLabels="true" showTickMarks="true" />
-                
-                <Separator />
-                
-                <Button fx:id="helloButton" maxWidth="1.997689E308" mnemonicParsing="false" onAction="#handleHelloAction" text="Trigger Hello World" />
-                <Button fx:id="generateButton" maxWidth="1.997689E308" mnemonicParsing="false" onAction="#handleGenerateAction" text="Generate Test Summaries" />
-              </children>
-            </VBox>
-          </children>
-        </AnchorPane>
-        
-        <AnchorPane>
-          <children>
-            <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <padding>
-                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-              </padding>
-              <children>
-                <Label text="Linguistic Summary Output">
-                  <font>
-                    <Font name="System Bold" size="14.0" />
-                  </font>
-                </Label>
-                <TextArea fx:id="outputArea" editable="false" prefHeight="450.0" prefWidth="500.0" VBox.vgrow="ALWAYS" />
-              </children>
-            </VBox>
-          </children>
-        </AnchorPane>
+        <Label text="KSR – Podsumowania Lingwistyczne" styleClass="header-title"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <ToggleButton fx:id="viewToggle" text="Widok Zaawansowany" onAction="#handleToggleView"/>
       </items>
-    </SplitPane>
-    <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: #e8e8e8;">
+    </ToolBar>
+
+    <StackPane VBox.vgrow="ALWAYS">
+      <VBox fx:id="basicView" spacing="0">
+
+        <SplitPane dividerPositions="0.25, 0.55" VBox.vgrow="ALWAYS">
+          <items>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+              <content>
+                <VBox spacing="10" styleClass="config-panel">
+                  <children>
+                    <Label text="Konfiguracja generowania" styleClass="section-title"/>
+                    <Separator/>
+
+                    <TitledPane text="Kwantyfikatory" animated="false">
+                      <content>
+                        <VBox fx:id="quantifierCheckboxes" spacing="4"/>
+                      </content>
+                    </TitledPane>
+
+                    <TitledPane text="Sumaryzatory" animated="false">
+                      <content>
+                        <VBox fx:id="summarizerCheckboxes" spacing="4"/>
+                      </content>
+                    </TitledPane>
+
+                    <TitledPane text="Kwalifikatory (opcjonalne)" animated="false" expanded="false">
+                      <content>
+                        <VBox fx:id="qualifierCheckboxes" spacing="4"/>
+                      </content>
+                    </TitledPane>
+
+                    <Separator/>
+                    <Button text="Generuj podsumowania" onAction="#handleGenerate" maxWidth="Infinity"/>
+                  </children>
+                </VBox>
+              </content>
+            </ScrollPane>
+
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+              <content>
+                <VBox spacing="8" styleClass="weights-panel">
+                  <children>
+                    <Label text="Wagi miar jakości" styleClass="section-title"/>
+                    <Separator/>
+                    <VBox fx:id="weightsContainer" spacing="6"/>
+                    <Separator/>
+                    <Button text="Przelicz wynik optymalny" onAction="#handleRecalculate" maxWidth="Infinity" styleClass="button-secondary"/>
+                  </children>
+                </VBox>
+              </content>
+            </ScrollPane>
+
+            <VBox spacing="8" styleClass="results-panel">
+              <children>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                  <children>
+                    <Label text="Wyniki" styleClass="section-title"/>
+                    <Pane HBox.hgrow="ALWAYS"/>
+                    <Label text="Sortuj po:"/>
+                    <ComboBox fx:id="sortCombo" onAction="#handleSort"/>
+                    <Button text="Zapisz zaznaczone" onAction="#handleSaveSelected" styleClass="button-success"/>
+                  </children>
+                </HBox>
+                <Separator/>
+                <TableView fx:id="summaryTable" VBox.vgrow="ALWAYS"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                  <children>
+                    <CheckBox fx:id="selectAllCheckbox" text="Zaznacz wszystkie" onAction="#handleSelectAll"/>
+                    <Pane HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="resultCountLabel" text="0 wyników"/>
+                  </children>
+                </HBox>
+              </children>
+            </VBox>
+
+          </items>
+        </SplitPane>
+      </VBox>
+
+      <VBox fx:id="advancedView" spacing="0" visible="false">
+
+        <SplitPane dividerPositions="0.45" VBox.vgrow="ALWAYS">
+          <items>
+
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+              <content>
+                <VBox spacing="12" styleClass="config-panel">
+                  <padding>
+                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                  </padding>
+                  <children>
+                    <Label text="Definiowanie nowych etykiet" styleClass="section-title"/>
+                    <Separator/>
+
+                    <Label text="Typ:"/>
+                    <ComboBox fx:id="advTypeCombo" maxWidth="Infinity"/>
+
+                    <Label text="Nazwa atrybutu:"/>
+                    <TextField fx:id="advAttributeField" promptText="np. cena"/>
+
+                    <Label text="Nazwa etykiety:"/>
+                    <TextField fx:id="advLabelField" promptText="np. tani"/>
+
+                    <Label text="Typ funkcji przynależności:"/>
+                    <ComboBox fx:id="advMfCombo" maxWidth="Infinity" onAction="#handleMfTypeChange"/>
+
+                    <VBox fx:id="advParamsContainer" spacing="6">
+                    </VBox>
+
+                    <HBox spacing="10">
+                      <children>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                          <children>
+                            <Label text="Początek przedziału:"/>
+                            <TextField fx:id="advUnivMinField" promptText="0.0"/>
+                          </children>
+                        </VBox>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                          <children>
+                            <Label text="Koniec przedziału:"/>
+                            <TextField fx:id="advUnivMaxField" promptText="1.0"/>
+                          </children>
+                        </VBox>
+                      </children>
+                    </HBox>
+
+                    <Separator/>
+                    <Button text="Dodaj etykietę" onAction="#handleAddLabel" maxWidth="Infinity"/>
+                  </children>
+                </VBox>
+              </content>
+            </ScrollPane>
+
+            <VBox spacing="8" styleClass="results-panel">
+              <children>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                  <children>
+                    <Label text="Zdefiniowane etykiety" styleClass="section-title"/>
+                    <Pane HBox.hgrow="ALWAYS"/>
+                    <Button text="Usuń zaznaczoną" onAction="#handleRemoveLabel" styleClass="button-danger"/>
+                  </children>
+                </HBox>
+                <Separator/>
+                <TableView fx:id="labelsTable" VBox.vgrow="ALWAYS"/>
+              </children>
+            </VBox>
+
+          </items>
+        </SplitPane>
+      </VBox>
+
+    </StackPane>
+
+    <HBox alignment="CENTER_LEFT" styleClass="status-bar">
       <children>
-        <Label fx:id="statusLabel" text="Ready" HBox.hgrow="ALWAYS">
-          <font>
-            <Font size="11.0" />
-          </font>
-        </Label>
+        <Label fx:id="statusLabel" text="Gotowy. Wybierz konfigurację i wygeneruj podsumowania."/>
       </children>
-      <padding>
-        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-      </padding>
     </HBox>
+
   </children>
 </VBox>
