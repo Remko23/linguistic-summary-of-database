@@ -87,6 +87,13 @@ public class MainWindowController {
     private final Map<CheckBox, FuzzyStatement> summarizerMap = new LinkedHashMap<>();
     private final Map<CheckBox, FuzzyStatement> qualifierMap = new LinkedHashMap<>();
     private final Slider[] weightSliders = new Slider[11];
+    private final TextField[] weightFields = new TextField[11];
+
+    private static final double[] DEFAULT_WEIGHTS = {
+            1.0, 0.5, 0.35, 0.4, 0.1,
+            0.25, 0.25, 0.25,
+            0.0, 0.0, 0.0
+    };
 
     private final ObservableList<SummaryRow> summaryRows = FXCollections.observableArrayList();
     private final ObservableList<LabelDefinition> labelDefinitions = FXCollections.observableArrayList();
@@ -111,12 +118,12 @@ public class MainWindowController {
         ATTR_DISPLAY_NAMES.put("a_r", "Atrakcyjność wizualna");
         ATTR_DISPLAY_NAMES.put("a_h", "Bogactwo źródeł");
         ATTR_DISPLAY_NAMES.put("t_r", "Unikalność słów");
-        ATTR_DISPLAY_NAMES.put("w_l", "Średnia dł. słowa");
+        ATTR_DISPLAY_NAMES.put("w_l", "Średnia długość słowa");
         ATTR_DISPLAY_NAMES.put("a_s", "Subiektywność artykułu");
-        ATTR_DISPLAY_NAMES.put("a_e", "Nacech. emocj. artykułu");
+        ATTR_DISPLAY_NAMES.put("a_e", "Nacechowanie emocjonalne artykułu");
         ATTR_DISPLAY_NAMES.put("t_s", "Subiektywność tytułu");
-        ATTR_DISPLAY_NAMES.put("t_e", "Nacech. emocj. tytułu");
-        ATTR_DISPLAY_NAMES.put("p", "Stosunek poz. słów");
+        ATTR_DISPLAY_NAMES.put("t_e", "Nacechowanie emocjonalne tytułu");
+        ATTR_DISPLAY_NAMES.put("p", "Stosunek pozytywnych słów");
         ATTR_DISPLAY_NAMES.put("s", "Popularność");
     }
 
@@ -160,7 +167,7 @@ public class MainWindowController {
                 quantifierCheckboxes.getChildren().add(header);
                 for (String label : var.getLabels()) {
                     Quantifier q = new RelativeQuantifier(label, var.getLabelSet(label));
-                    CheckBox cb = new CheckBox(label.replace("_", " "));
+                    CheckBox cb = new CheckBox(SummaryGenerator.mapQuantifierName(label));
                     cb.setSelected(true);
                     quantifierMap.put(cb, q);
                     quantifierCheckboxes.getChildren().add(cb);
@@ -171,31 +178,109 @@ public class MainWindowController {
                 quantifierCheckboxes.getChildren().add(header);
                 for (String label : var.getLabels()) {
                     Quantifier q = new AbsoluteQuantifier(label, var.getLabelSet(label));
-                    CheckBox cb = new CheckBox(label.replace("_", " "));
+                    CheckBox cb = new CheckBox(SummaryGenerator.mapQuantifierName(label));
                     cb.setSelected(true);
                     quantifierMap.put(cb, q);
                     quantifierCheckboxes.getChildren().add(cb);
                 }
             } else {
                 String displayName = ATTR_DISPLAY_NAMES.getOrDefault(name, name);
-                Label header = new Label(displayName + ":");
-                header.setStyle("-fx-font-weight: bold; -fx-text-fill: #9ca3af; -fx-font-size: 11px;");
-                summarizerCheckboxes.getChildren().add(header);
+                CheckBox varSumCheckbox = new CheckBox(displayName);
+                varSumCheckbox.getStyleClass().add("variable-checkbox");
+                varSumCheckbox.setAllowIndeterminate(true);
+                varSumCheckbox.setSelected(false);
+
+                VBox sumLabelsBox = new VBox(3);
+                List<CheckBox> sumLabelCheckboxes = new ArrayList<>();
 
                 for (String label : var.getLabels()) {
                     FuzzyStatement stmt = new FuzzyStatement(name, label, var.getLabelSet(label));
-
                     CheckBox cbSum = new CheckBox(label.replace("_", " "));
                     cbSum.setSelected(false);
                     summarizerMap.put(cbSum, stmt);
-                    summarizerCheckboxes.getChildren().add(cbSum);
+                    sumLabelCheckboxes.add(cbSum);
+                    sumLabelsBox.getChildren().add(cbSum);
+                }
 
-                    CheckBox cbQual = new CheckBox(displayName + " – " + label.replace("_", " "));
+                bindVariableCheckbox(varSumCheckbox, sumLabelCheckboxes);
+
+                TitledPane sumPane = new TitledPane();
+                sumPane.setGraphic(varSumCheckbox);
+                sumPane.setText(null);
+                sumPane.setContent(sumLabelsBox);
+                sumPane.setExpanded(false);
+                sumPane.setAnimated(false);
+                sumPane.getStyleClass().add("variable-pane");
+                summarizerCheckboxes.getChildren().add(sumPane);
+
+                CheckBox varQualCheckbox = new CheckBox(displayName);
+                varQualCheckbox.getStyleClass().add("variable-checkbox");
+                varQualCheckbox.setAllowIndeterminate(true);
+                varQualCheckbox.setSelected(false);
+
+                VBox qualLabelsBox = new VBox(3);
+                List<CheckBox> qualLabelCheckboxes = new ArrayList<>();
+
+                for (String label : var.getLabels()) {
+                    FuzzyStatement stmt = new FuzzyStatement(name, label, var.getLabelSet(label));
+                    CheckBox cbQual = new CheckBox(label.replace("_", " "));
                     cbQual.setSelected(false);
                     qualifierMap.put(cbQual, stmt);
-                    qualifierCheckboxes.getChildren().add(cbQual);
+                    qualLabelCheckboxes.add(cbQual);
+                    qualLabelsBox.getChildren().add(cbQual);
                 }
+
+                bindVariableCheckbox(varQualCheckbox, qualLabelCheckboxes);
+
+                TitledPane qualPane = new TitledPane();
+                qualPane.setGraphic(varQualCheckbox);
+                qualPane.setText(null);
+                qualPane.setContent(qualLabelsBox);
+                qualPane.setExpanded(false);
+                qualPane.setAnimated(false);
+                qualPane.getStyleClass().add("variable-pane");
+                qualifierCheckboxes.getChildren().add(qualPane);
             }
+        }
+    }
+
+    private void bindVariableCheckbox(CheckBox parent, List<CheckBox> children) {
+        final boolean[] updating = { false };
+
+        parent.setOnAction(e -> {
+            if (updating[0])
+                return;
+            updating[0] = true;
+            boolean selected = parent.isSelected();
+            if (parent.isIndeterminate()) {
+                parent.setIndeterminate(false);
+                parent.setSelected(true);
+                for (CheckBox cb : children)
+                    cb.setSelected(true);
+            } else {
+                for (CheckBox cb : children)
+                    cb.setSelected(selected);
+            }
+            updating[0] = false;
+        });
+
+        for (CheckBox child : children) {
+            child.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                if (updating[0])
+                    return;
+                updating[0] = true;
+                long selectedCount = children.stream().filter(CheckBox::isSelected).count();
+                if (selectedCount == 0) {
+                    parent.setIndeterminate(false);
+                    parent.setSelected(false);
+                } else if (selectedCount == children.size()) {
+                    parent.setIndeterminate(false);
+                    parent.setSelected(true);
+                } else {
+                    parent.setIndeterminate(true);
+                }
+                updating[0] = false;
+            });
         }
     }
 
@@ -205,7 +290,9 @@ public class MainWindowController {
             Label lbl = new Label(MEASURE_NAMES[i]);
             lbl.setStyle("-fx-font-size: 11px;");
 
-            Slider slider = new Slider(0, 1, 1.0);
+            double defaultWeight = DEFAULT_WEIGHTS[i];
+
+            Slider slider = new Slider(0, 1, defaultWeight);
             slider.setShowTickLabels(true);
             slider.setShowTickMarks(true);
             slider.setMajorTickUnit(0.25);
@@ -213,17 +300,34 @@ public class MainWindowController {
             slider.setBlockIncrement(0.05);
             slider.setMaxWidth(Double.MAX_VALUE);
 
-            Label valueLabel = new Label("1.00");
-            valueLabel.setMinWidth(35);
-            valueLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #7c3aed; -fx-font-weight: bold;");
-            slider.valueProperty().addListener(
-                    (obs, oldVal, newVal) -> valueLabel.setText(String.format("%.2f", newVal.doubleValue())));
+            TextField weightField = new TextField(String.format("%.2f", defaultWeight));
+            weightField.getStyleClass().add("weight-field");
 
-            HBox row = new HBox(8, lbl, slider, valueLabel);
+            slider.valueProperty().addListener(
+                    (obs, oldVal, newVal) -> weightField.setText(String.format("%.2f", newVal.doubleValue())));
+
+            Runnable applyFieldValue = () -> {
+                try {
+                    double val = Double.parseDouble(weightField.getText().replace(',', '.').trim());
+                    val = Math.max(0.0, Math.min(1.0, val));
+                    slider.setValue(val);
+                    weightField.setText(String.format("%.2f", val));
+                } catch (NumberFormatException ex) {
+                    weightField.setText(String.format("%.2f", slider.getValue()));
+                }
+            };
+            weightField.setOnAction(e -> applyFieldValue.run());
+            weightField.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+                if (!isFocused)
+                    applyFieldValue.run();
+            });
+
+            HBox row = new HBox(8, lbl, slider, weightField);
             row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
             HBox.setHgrow(slider, javafx.scene.layout.Priority.ALWAYS);
 
             weightSliders[i] = slider;
+            weightFields[i] = weightField;
             weightsContainer.getChildren().add(row);
         }
     }
@@ -342,6 +446,10 @@ public class MainWindowController {
         for (int i = 0; i < summaries.size(); i++) {
             summaryRows.add(new SummaryRow(i + 1, summaries.get(i)));
         }
+        FXCollections.sort(summaryRows, Comparator.comparingDouble(SummaryRow::getOverallScore).reversed());
+        for (int i = 0; i < summaryRows.size(); i++) {
+            summaryRows.get(i).indexProperty().set(i + 1);
+        }
 
         resultCountLabel.setText(summaries.size() + " wyników");
         statusLabel.setText("Wygenerowano " + summaries.size() + " podsumowań dla " + records.size() + " rekordów.");
@@ -365,6 +473,10 @@ public class MainWindowController {
         summaryRows.clear();
         for (int i = 0; i < dtos.size(); i++) {
             summaryRows.add(new SummaryRow(i + 1, dtos.get(i)));
+        }
+        FXCollections.sort(summaryRows, Comparator.comparingDouble(SummaryRow::getOverallScore).reversed());
+        for (int i = 0; i < summaryRows.size(); i++) {
+            summaryRows.get(i).indexProperty().set(i + 1);
         }
 
         statusLabel.setText("Przeliczono wyniki z nowymi wagami.");
@@ -427,7 +539,6 @@ public class MainWindowController {
             return;
 
         try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
-            out.println("=== Podsumowania Lingwistyczne – KSR ===");
             out.println("Wagi: " + getWeightsFromSliders());
             out.println("Liczba zapisanych: " + selected.size());
             out.println();
@@ -445,6 +556,52 @@ public class MainWindowController {
             }
 
             statusLabel.setText("Zapisano " + selected.size() + " podsumowań do: " + file.getName());
+        } catch (IOException e) {
+            showAlert("Błąd zapisu", "Nie udało się zapisać pliku: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleSaveTop5(ActionEvent event) {
+        if (summaryRows.isEmpty()) {
+            showAlert("Brak wyników", "Najpierw wygeneruj podsumowania.");
+            return;
+        }
+
+        List<SummaryRow> visibleRows = summaryTable.getItems();
+        int count = Math.min(5, visibleRows.size());
+        List<SummaryRow> top5 = new ArrayList<>(visibleRows.subList(0, count));
+
+        String sortedBy = sortCombo.getValue() != null ? sortCombo.getValue() : "T (Ogólny)";
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Zapisz TOP 5 do pliku");
+        fc.setInitialFileName("top5.txt");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pliki tekstowe", "*.txt"));
+
+        File file = fc.showSaveDialog(summaryTable.getScene().getWindow());
+        if (file == null)
+            return;
+
+        try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
+            out.println("Sortowanie: " + sortedBy);
+            out.println("Wagi: " + getWeightsFromSliders());
+            out.println();
+
+            for (int i = 0; i < top5.size(); i++) {
+                SummaryRow row = top5.get(i);
+                out.printf("%d. T=%.4f%n", i + 1, row.getOverallScore());
+                out.printf("   \"%s\"%n", row.getSummaryText());
+                for (int j = 1; j <= 11; j++) {
+                    out.printf("   T%d=%.4f", j, row.getMeasure(j));
+                    if (j < 11)
+                        out.print(", ");
+                }
+                out.println();
+                out.println();
+            }
+
+            statusLabel.setText("Zapisano TOP " + top5.size() + " do: " + file.getName());
         } catch (IOException e) {
             showAlert("Błąd zapisu", "Nie udało się zapisać pliku: " + e.getMessage());
         }

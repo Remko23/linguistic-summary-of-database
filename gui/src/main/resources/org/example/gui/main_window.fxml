@@ -79,6 +79,7 @@
                     <Pane HBox.hgrow="ALWAYS"/>
                     <Label text="Sortuj po:"/>
                     <ComboBox fx:id="sortCombo" onAction="#handleSort"/>
+                    <Button text="Zapisz TOP 5" onAction="#handleSaveTop5" styleClass="button-secondary"/>
                     <Button text="Zapisz zaznaczone" onAction="#handleSaveSelected" styleClass="button-success"/>
                   </children>
                 </HBox>

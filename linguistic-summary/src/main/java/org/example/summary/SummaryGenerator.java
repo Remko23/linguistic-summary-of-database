@@ -64,8 +64,9 @@ public class SummaryGenerator {
                 List<FuzzyStatement> sumList = Collections.singletonList(sumVar);
 
                 String text = String.format("%s artykułów z grupy %s w porównaniu do %s ma %s %s",
-                        q.getName().replace("_", " "), group1Name, group2Name, mapAttributeName(sumVar.getAttributeName()), sumVar.getLabel().replace("_", " "));
-                
+                        mapQuantifierName(q.getName()), group1Name, group2Name,
+                        mapAttributeName(sumVar.getAttributeName()), sumVar.getLabel().replace("_", " "));
+
                 LinguisticSummaryDTO dto = new LinguisticSummaryDTO(text);
 
                 double t1 = QualityEvaluator.evaluateT1(group1, q, null, sumList);
@@ -90,15 +91,14 @@ public class SummaryGenerator {
     }
 
     private String buildSentence(String quantifier, FuzzyStatement qualifier, FuzzyStatement summarizer) {
-        // Zmiana podkreśleń na spacje, zaczynamy zdanie wielką literą dla kwantyfikatora
-        String qName = quantifier.replace("_", " ");
+        String qName = mapQuantifierName(quantifier);
         qName = qName.substring(0, 1).toUpperCase() + qName.substring(1);
-        
+
         String sumAttr = mapAttributeName(summarizer.getAttributeName());
         String sumLabel = summarizer.getLabel().replace("_", " ");
 
         if (qualifier == null) {
-            return String.format("%s artykułów ma %s %s.", 
+            return String.format("%s artykułów ma %s %s.",
                     qName, sumAttr, sumLabel);
         } else {
             String qualAttr = mapAttributeName(qualifier.getAttributeName());
@@ -108,19 +108,61 @@ public class SummaryGenerator {
         }
     }
 
+    public static String mapQuantifierName(String fclName) {
+        switch (fclName) {
+            case "prawie_zaden":
+                return "prawie żaden";
+            case "okolo_1_4":
+                return "około 1/4";
+            case "okolo_polowy":
+                return "około połowy";
+            case "okolo_3_4":
+                return "około 3/4";
+            case "prawie_wszystkie":
+                return "prawie wszystkie";
+            case "mniejszosc":
+                return "mniejszość";
+            case "wiekszosc":
+                return "większość";
+            case "okolo_0":
+                return "około 0";
+            case "okolo_10_tys":
+                return "około 10 tys.";
+            case "okolo_20_tys":
+                return "około 20 tys.";
+            case "okolo_30_tys":
+                return "około 30 tys.";
+            case "okolo_40_tys":
+                return "około 40 tys.";
+            default:
+                return fclName.replace("_", " ");
+        }
+    }
+
     private String mapAttributeName(String fclName) {
         switch (fclName) {
-            case "a_r": return "atrakcyjność wizualna";
-            case "a_h": return "bogactwo źródeł";
-            case "t_r": return "unikalność słów artykułu";
-            case "w_l": return "średnia długość słowa";
-            case "a_s": return "współczynnik subiektywności artykułu";
-            case "a_e": return "współczynnik nacechowania emocjonalnego artykułu";
-            case "t_s": return "współczynnik subiektywności tytułu";
-            case "t_e": return "współczynnik nacechowania emocjonalnego tytułu";
-            case "p": return "stosunek pozytywnych słów";
-            case "s": return "popularność artykułu";
-            default: return fclName;
+            case "a_r":
+                return "atrakcyjność wizualna";
+            case "a_h":
+                return "bogactwo źródeł";
+            case "t_r":
+                return "unikalność słów artykułu";
+            case "w_l":
+                return "średnia długość słowa";
+            case "a_s":
+                return "współczynnik subiektywności artykułu";
+            case "a_e":
+                return "współczynnik nacechowania emocjonalnego artykułu";
+            case "t_s":
+                return "współczynnik subiektywności tytułu";
+            case "t_e":
+                return "współczynnik nacechowania emocjonalnego tytułu";
+            case "p":
+                return "stosunek pozytywnych słów";
+            case "s":
+                return "popularność artykułu";
+            default:
+                return fclName;
         }
     }
 }
