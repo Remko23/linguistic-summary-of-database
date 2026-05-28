@@ -5,11 +5,11 @@ top to bottom direction
 skinparam linetype ortho
 
 class AbsoluteQuantifier {
-  + AbsoluteQuantifier(String, FuzzySet): 
+  + AbsoluteQuantifier(String, FuzzySet):
 }
 class ClassicSet {
-  + ClassicSet(Set<Double>): 
-  + ClassicSet(double, double): 
+  + ClassicSet(Set<Double>):
+  + ClassicSet(double, double):
   - minBound: double
   - discreteElements: Set<Double>
   - isContinuous: boolean
@@ -22,7 +22,7 @@ class ClassicSet {
 }
 
 class FuzzySet {
-  + FuzzySet(ClassicSet, MembershipFunction): 
+  + FuzzySet(ClassicSet, MembershipFunction):
   - membershipFunction: MembershipFunction
   - universe: ClassicSet
   + union(FuzzySet): FuzzySet
@@ -33,15 +33,15 @@ class FuzzySet {
    universe: ClassicSet
 }
 class GaussianMembershipFunction {
-  + GaussianMembershipFunction(double, double): 
+  + GaussianMembershipFunction(double, double):
   - mean: double
   - sigma: double
   + getMembership(double): double
-   mean: double
-   sigma: double
+  + getMean(): double
+  + getSigma(): double
 }
 class LinguisticSummaryDTO {
-  + LinguisticSummaryDTO(String): 
+  + LinguisticSummaryDTO(String):
   - summaryText: String
   - overallScore: double
   - qualityMeasures: Map<Integer, Double>
@@ -53,7 +53,7 @@ class LinguisticSummaryDTO {
    overallScore: double
 }
 class LinguisticVariable {
-  + LinguisticVariable(String): 
+  + LinguisticVariable(String):
   - attributeName: String
   - labels: Map<String, FuzzySet>
   + addLabel(String, FuzzySet): void
@@ -66,11 +66,11 @@ interface MembershipFunction << interface >> {
   + getMembership(double): double
 }
 class OptimalSummaryOptimizer {
-  + OptimalSummaryOptimizer(): 
+  + OptimalSummaryOptimizer():
   + optimize(List<LinguisticSummaryDTO>, Map<Integer, Double>): List<LinguisticSummaryDTO>
 }
 class QualityEvaluator {
-  + QualityEvaluator(): 
+  + QualityEvaluator():
   + evaluateT2(List<FuzzySet>): double
   + evaluateT5(List<FuzzySet>): double
   + evaluateT9(List<FuzzySet>): double
@@ -87,7 +87,7 @@ class QualityEvaluator {
   - evaluateCombinedMembership(DataEntity, List<FuzzySet>): double
 }
 class Quantifier {
-  + Quantifier(String, FuzzySet): 
+  + Quantifier(String, FuzzySet):
   # name: String
   # fuzzySet: FuzzySet
   + getMembership(double): double
@@ -95,10 +95,10 @@ class Quantifier {
    fuzzySet: FuzzySet
 }
 class RelativeQuantifier {
-  + RelativeQuantifier(String, FuzzySet): 
+  + RelativeQuantifier(String, FuzzySet):
 }
 class FuzzyStatement {
-  + FuzzyStatement(String, String, FuzzySet): 
+  + FuzzyStatement(String, String, FuzzySet):
   - attributeName: String
   - label: String
   - fuzzySet: FuzzySet
@@ -107,37 +107,37 @@ class FuzzyStatement {
   + getFuzzySet(): FuzzySet
 }
 class SubjectPartitioner {
-  + SubjectPartitioner(): 
+  + SubjectPartitioner():
   + split(List<DataEntity>, Predicate<DataEntity>): List<List<DataEntity>>
   + filter(List<DataEntity>, Predicate<DataEntity>): List<DataEntity>
 }
 class SummaryGenerator {
-  + SummaryGenerator(): 
+  + SummaryGenerator():
   + generateSingleSubject(List<DataEntity>, List<Quantifier>, List<FuzzySet>, List<LinguisticVariable>): List<LinguisticSummaryDTO>
   + generateMultiSubject(List<DataEntity>, List<DataEntity>, String, String, List<Quantifier>, List<LinguisticVariable>): List<LinguisticSummaryDTO>
   - buildSentence(String, FuzzySet, String, String): String
 }
 class TrapezoidalMembershipFunction {
-  + TrapezoidalMembershipFunction(double, double, double, double): 
+  + TrapezoidalMembershipFunction(double, double, double, double):
   - c: double
   - a: double
   - b: double
   - d: double
   + getMembership(double): double
-   d: double
-   c: double
-   b: double
-   a: double
+  + getA(): double
+  + getB(): double
+  + getC(): double
+  + getD(): double
 }
 class TriangularMembershipFunction {
-  + TriangularMembershipFunction(double, double, double): 
+  + TriangularMembershipFunction(double, double, double):
   - c: double
   - b: double
   - a: double
   + getMembership(double): double
-   c: double
-   b: double
-   a: double
+  + getA(): double
+  + getB(): double
+  + getC(): double
 }
 
 AbsoluteQuantifier             -[#000082,plain]-^  Quantifier
