@@ -66,6 +66,7 @@
                     <VBox fx:id="weightsContainer" spacing="6"/>
                     <Separator/>
                     <Button text="Przelicz wynik optymalny" onAction="#handleRecalculate" maxWidth="Infinity" styleClass="button-secondary"/>
+                    <Button text="Eksperyment" onAction="#handleExperiment" maxWidth="Infinity" styleClass="button-success"/>
                   </children>
                 </VBox>
               </content>

@@ -827,12 +827,150 @@ public class MainWindowController {
         statusLabel.setText("Usunięto etykietę: " + selected.getLabelName());
     }
 
+    @FXML
+    private void handleExperiment(ActionEvent event) {
+        statusLabel.setText("Eksperyment – generowanie TOP 5 dla każdej zmiennej...");
+
+        List<Quantifier> allQuantifiers = new ArrayList<>();
+        for (Map.Entry<CheckBox, Quantifier> e : quantifierMap.entrySet()) {
+            allQuantifiers.add(e.getValue());
+        }
+
+        if (allQuantifiers.isEmpty()) {
+            showAlert("Brak kwantyfikatorów", "Nie znaleziono żadnych kwantyfikatorów.");
+            return;
+        }
+
+        List<DataEntity> records;
+        try {
+            records = repository.getAllRecords();
+        } catch (Exception e) {
+            showAlert("Błąd bazy danych", "Nie udało się załadować danych: " + e.getMessage());
+            return;
+        }
+
+        if (records.isEmpty()) {
+            showAlert("Brak danych", "Baza danych nie zwróciła żadnych rekordów.");
+            return;
+        }
+
+        Map<Integer, Double> weights = getWeightsFromSliders();
+
+        List<LinguisticVariable> summarizerVariables = new ArrayList<>();
+        for (LinguisticVariable var : allVariables) {
+            String name = var.getAttributeName();
+            if (!name.equals("kwantyfikator_wzgledny") && !name.equals("kwantyfikator_bezwzgledny")) {
+                summarizerVariables.add(var);
+            }
+        }
+
+        if (summarizerVariables.isEmpty()) {
+            showAlert("Brak zmiennych", "Nie znaleziono zmiennych lingwistycznych do eksperymentu.");
+            return;
+        }
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Zapisz wyniki eksperymentu");
+        fc.setInitialFileName("eksperyment_top5.json");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pliki JSON", "*.json"));
+
+        File file = fc.showSaveDialog(summaryTable.getScene().getWindow());
+        if (file == null)
+            return;
+
+        int totalSaved = 0;
+
+        try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
+            StringBuilder json = new StringBuilder();
+            json.append("{\n");
+            json.append("  \"eksperyment\": \"TOP 5 podsumowań dla każdej zmiennej lingwistycznej\",\n");
+
+            json.append("  \"wagi\": {");
+            for (int i = 1; i <= 11; i++) {
+                json.append(String.format("\"T%d\": %.4f", i, weights.getOrDefault(i, 0.0)));
+                if (i < 11) json.append(", ");
+            }
+            json.append("},\n");
+
+            json.append("  \"liczba_rekordow\": ").append(records.size()).append(",\n");
+            json.append("  \"zmienne\": [\n");
+
+            for (int v = 0; v < summarizerVariables.size(); v++) {
+                LinguisticVariable var = summarizerVariables.get(v);
+                String attrName = var.getAttributeName();
+                String displayName = ATTR_DISPLAY_NAMES.getOrDefault(attrName, attrName);
+
+                List<FuzzyStatement> varSummarizers = new ArrayList<>();
+                for (String label : var.getLabels()) {
+                    varSummarizers.add(new FuzzyStatement(attrName, label, var.getLabelSet(label)));
+                }
+
+                List<FuzzyStatement> noQualifiers = new ArrayList<>();
+                List<LinguisticSummaryDTO> summaries = generator.generateSingleSubject(
+                        records, allQuantifiers, noQualifiers, varSummarizers);
+
+                summaries = OptimalSummaryOptimizer.optimize(summaries, weights);
+
+                int count = Math.min(5, summaries.size());
+
+                json.append("    {\n");
+                json.append("      \"atrybut\": \"").append(escapeJson(attrName)).append("\",\n");
+                json.append("      \"nazwa\": \"").append(escapeJson(displayName)).append("\",\n");
+                json.append("      \"liczba_podsumowan\": ").append(summaries.size()).append(",\n");
+                json.append("      \"top5\": [\n");
+
+                for (int i = 0; i < count; i++) {
+                    LinguisticSummaryDTO dto = summaries.get(i);
+                    json.append("        {\n");
+                    json.append("          \"lp\": ").append(i + 1).append(",\n");
+                    json.append("          \"tekst\": \"").append(escapeJson(dto.getSummaryText())).append("\",\n");
+                    json.append(String.format("          \"T\": %.4f,\n", dto.getOverallScore()));
+                    json.append("          \"miary\": {");
+                    for (int j = 1; j <= 11; j++) {
+                        json.append(String.format("\"T%d\": %.4f", j, dto.getMeasure(j)));
+                        if (j < 11) json.append(", ");
+                    }
+                    json.append("}\n");
+                    json.append("        }");
+                    if (i < count - 1) json.append(",");
+                    json.append("\n");
+                    totalSaved++;
+                }
+
+                json.append("      ]\n");
+                json.append("    }");
+                if (v < summarizerVariables.size() - 1) json.append(",");
+                json.append("\n");
+            }
+
+            json.append("  ],\n");
+            json.append("  \"lacznie_podsumowan\": ").append(totalSaved).append("\n");
+            json.append("}\n");
+
+            out.print(json);
+
+            statusLabel.setText("Eksperyment zakończony – zapisano " + totalSaved
+                    + " podsumowań do: " + file.getName());
+        } catch (IOException e) {
+            showAlert("Błąd zapisu", "Nie udało się zapisać pliku: " + e.getMessage());
+        }
+    }
+
     private Map<Integer, Double> getWeightsFromSliders() {
         Map<Integer, Double> weights = new HashMap<>();
         for (int i = 0; i < 11; i++) {
             weights.put(i + 1, weightSliders[i].getValue());
         }
         return weights;
+    }
+
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 
     private void showAlert(String title, String content) {
