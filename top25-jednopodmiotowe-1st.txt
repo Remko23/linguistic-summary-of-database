@@ -1,0 +1,103 @@
+Sortowanie: T (Ogólny)
+Wagi: {1=1.0, 2=0.5, 3=0.35, 4=0.4, 5=0.1, 6=0.25, 7=0.25, 8=0.25, 9=0.0, 10=0.0, 11=0.0}
+
+1. T=0.7621
+   "Większość artykułów ma atrakcyjność wizualna surowa."
+   T1=1.0000,    T2=0.8920,    T3=0.8975,    T4=0.0000,    T5=1.0000,    T6=0.5020,    T7=0.6018,    T8=0.9054,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+2. T=0.7431
+   "Około 20 tys. artykułów ma średnia długość słowa mala."
+   T1=1.0000,    T2=0.6860,    T3=0.8473,    T4=0.0000,    T5=1.0000,    T6=0.7040,    T7=0.8004,    T8=0.7517,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+3. T=0.7429
+   "Około połowy artykułów ma średnia długość słowa mala."
+   T1=1.0000,    T2=0.6860,    T3=0.8473,    T4=0.0000,    T5=1.0000,    T6=0.7020,    T7=0.8004,    T8=0.7517,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+4. T=0.7407
+   "Około 30 tys. artykułów ma współczynnik nacechowania emocjonalnego artykułu neutralny."
+   T1=1.0000,    T2=0.6460,    T3=0.8809,    T4=0.0000,    T5=1.0000,    T6=0.7040,    T7=0.8004,    T8=0.7550,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+5. T=0.7405
+   "Około 3/4 artykułów ma współczynnik nacechowania emocjonalnego artykułu neutralny."
+   T1=1.0000,    T2=0.6460,    T3=0.8809,    T4=0.0000,    T5=1.0000,    T6=0.7020,    T7=0.8004,    T8=0.7550,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+6. T=0.7394
+   "Około 0 artykułów ma popularność artykułu niszowy."
+   T1=1.0000,    T2=1.0000,    T3=0.0032,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.9117,    T8=1.0000,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+7. T=0.7389
+   "Około 0 artykułów ma popularność artykułu bardzo niszowy."
+   T1=1.0000,    T2=1.0000,    T3=0.0006,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.9117,    T8=0.9980,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+8. T=0.7384
+   "Prawie żaden artykułów ma popularność artykułu niszowy."
+   T1=1.0000,    T2=1.0000,    T3=0.0032,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.8992,    T8=1.0000,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+9. T=0.7379
+   "Prawie żaden artykułów ma popularność artykułu bardzo niszowy."
+   T1=1.0000,    T2=1.0000,    T3=0.0006,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.8992,    T8=0.9980,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+10. T=0.7362
+   "Prawie żaden artykułów ma popularność artykułu popularny."
+   T1=1.0000,    T2=0.9440,    T3=0.0889,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.8992,    T8=0.9654,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+11. T=0.7295
+   "Około 20 tys. artykułów ma współczynnik subiektywności tytułu bardzo obiektywny."
+   T1=1.0000,    T2=0.8020,    T3=0.5097,    T4=0.0000,    T5=1.0000,    T6=0.7040,    T7=0.8004,    T8=0.8244,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+12. T=0.7294
+   "Około połowy artykułów ma współczynnik subiektywności tytułu bardzo obiektywny."
+   T1=1.0000,    T2=0.8020,    T3=0.5097,    T4=0.0000,    T5=1.0000,    T6=0.7020,    T7=0.8004,    T8=0.8244,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+13. T=0.7150
+   "Około 30 tys. artykułów ma unikalność słów artykułu sredni."
+   T1=1.0000,    T2=0.4960,    T3=0.9332,    T4=0.0000,    T5=1.0000,    T6=0.7040,    T7=0.8004,    T8=0.6636,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+14. T=0.7149
+   "Około 3/4 artykułów ma unikalność słów artykułu sredni."
+   T1=1.0000,    T2=0.4960,    T3=0.9332,    T4=0.0000,    T5=1.0000,    T6=0.7020,    T7=0.8004,    T8=0.6636,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+15. T=0.7141
+   "Około 1/4 artykułów ma bogactwo źródeł srednie."
+   T1=0.9287,    T2=0.9520,    T3=0.2627,    T4=0.0000,    T5=1.0000,    T6=0.7020,    T7=0.8004,    T8=0.9655,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+16. T=0.7097
+   "Około 20 tys. artykułów ma średnia długość słowa srednia."
+   T1=1.0000,    T2=0.4620,    T3=0.9589,    T4=0.0000,    T5=1.0000,    T6=0.7040,    T7=0.8004,    T8=0.6291,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+17. T=0.7095
+   "Około połowy artykułów ma średnia długość słowa srednia."
+   T1=1.0000,    T2=0.4620,    T3=0.9589,    T4=0.0000,    T5=1.0000,    T6=0.7020,    T7=0.8004,    T8=0.6291,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+18. T=0.7087
+   "Około 10 tys. artykułów ma bogactwo źródeł srednie."
+   T1=0.9115,    T2=0.9520,    T3=0.2627,    T4=0.0000,    T5=1.0000,    T6=0.7040,    T7=0.8004,    T8=0.9655,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+19. T=0.7084
+   "Większość artykułów ma współczynnik nacechowania emocjonalnego artykułu neutralny."
+   T1=1.0000,    T2=0.6460,    T3=0.8809,    T4=0.0000,    T5=1.0000,    T6=0.5020,    T7=0.6018,    T8=0.7550,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+20. T=0.7048
+   "Mniejszość artykułów ma bogactwo źródeł srednie."
+   T1=1.0000,    T2=0.9520,    T3=0.2627,    T4=0.0000,    T5=1.0000,    T6=0.5020,    T7=0.5998,    T8=0.9655,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+21. T=0.7043
+   "Około 0 artykułów ma współczynnik nacechowania emocjonalnego artykułu bardzo pozytywny."
+   T1=1.0000,    T2=0.8420,    T3=0.0006,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.9117,    T8=0.8852,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+22. T=0.7033
+   "Prawie żaden artykułów ma współczynnik nacechowania emocjonalnego artykułu bardzo pozytywny."
+   T1=1.0000,    T2=0.8420,    T3=0.0006,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.8992,    T8=0.8852,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+23. T=0.7021
+   "Około 10 tys. artykułów ma współczynnik subiektywności artykułu subiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.5159,    T4=0.0000,    T5=1.0000,    T6=0.7040,    T7=0.8004,    T8=0.7754,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+24. T=0.7019
+   "Około 1/4 artykułów ma współczynnik subiektywności artykułu subiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.5159,    T4=0.0000,    T5=1.0000,    T6=0.7020,    T7=0.8004,    T8=0.7754,    T9=0.0000,    T10=0.0000,    T11=0.0000
+
+25. T=0.7003
+   "Około 0 artykułów ma współczynnik nacechowania emocjonalnego artykułu bardzo negatywny."
+   T1=1.0000,    T2=0.8320,    T3=0.0028,    T4=0.0000,    T5=1.0000,    T6=0.8520,    T7=0.9117,    T8=0.8520,    T9=0.0000,    T10=0.0000,    T11=0.0000
+

@@ -562,20 +562,20 @@ public class MainWindowController {
     }
 
     @FXML
-    private void handleSaveTop5(ActionEvent event) {
+    private void handleSaveTop25(ActionEvent event) {
         if (summaryRows.isEmpty()) {
             showAlert("Brak wyników", "Najpierw wygeneruj podsumowania.");
             return;
         }
 
         List<SummaryRow> visibleRows = summaryTable.getItems();
-        int count = Math.min(5, visibleRows.size());
+        int count = Math.min(25, visibleRows.size());
         List<SummaryRow> top5 = new ArrayList<>(visibleRows.subList(0, count));
 
         String sortedBy = sortCombo.getValue() != null ? sortCombo.getValue() : "T (Ogólny)";
 
         FileChooser fc = new FileChooser();
-        fc.setTitle("Zapisz TOP 5 do pliku");
+        fc.setTitle("Zapisz TOP 25 do pliku");
         fc.setInitialFileName("top5.txt");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pliki tekstowe", "*.txt"));
 
