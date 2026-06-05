@@ -32,6 +32,95 @@ public class QualityEvaluator {
         }
     }
 
+    // ==================== Miary wielopodmiotowe ====================
+
+    /**
+     * Forma 1: Q P₁ w porównaniu do P₂ ma S.
+     * T₁ = µ_Q( r₁ / (r₁ + r₂) ), gdzie r_i = Σ min(µ_S(x), µ_Pi(x)) / Σ µ_Pi(x).
+     */
+    public static double evaluateT1MultiForm1(List<DataEntity> records,
+                                               FuzzyStatement subjectP1, FuzzyStatement subjectP2,
+                                               Quantifier quantifier, List<FuzzyStatement> summarizers) {
+        double r1 = computeSubjectSummarizerRatio(records, subjectP1, null, summarizers);
+        double r2 = computeSubjectSummarizerRatio(records, subjectP2, null, summarizers);
+        double denom = r1 + r2;
+        if (denom == 0.0) return 0.0;
+        return quantifier.getMembership(r1 / denom);
+    }
+
+    /**
+     * Forma 2: Q P₁ w porównaniu do P₂, mających W, ma S.
+     * Jak forma 1, ale r_i liczone z dodatkowym kwalifikatorem W.
+     */
+    public static double evaluateT1MultiForm2(List<DataEntity> records,
+                                               FuzzyStatement subjectP1, FuzzyStatement subjectP2,
+                                               Quantifier quantifier, FuzzyStatement qualifier,
+                                               List<FuzzyStatement> summarizers) {
+        double r1 = computeSubjectSummarizerRatio(records, subjectP1, qualifier, summarizers);
+        double r2 = computeSubjectSummarizerRatio(records, subjectP2, qualifier, summarizers);
+        double denom = r1 + r2;
+        if (denom == 0.0) return 0.0;
+        return quantifier.getMembership(r1 / denom);
+    }
+
+    /**
+     * Forma 3: Więcej/Mniej P₁ niż P₂ ma S.
+     * Zwraca [t1_wiecej, t1_mniej].
+     * t1_wiecej = 1 jeśli r₁ > r₂, t1_mniej = 1 jeśli r₁ < r₂.
+     */
+    public static double[] evaluateT1MultiForm3(List<DataEntity> records,
+                                                 FuzzyStatement subjectP1, FuzzyStatement subjectP2,
+                                                 List<FuzzyStatement> summarizers) {
+        double r1 = computeSubjectSummarizerRatio(records, subjectP1, null, summarizers);
+        double r2 = computeSubjectSummarizerRatio(records, subjectP2, null, summarizers);
+        double t1More = (r1 > r2) ? 1.0 : 0.0;
+        double t1Less = (r1 < r2) ? 1.0 : 0.0;
+        return new double[]{t1More, t1Less};
+    }
+
+    /**
+     * Forma 4: Więcej/Mniej P₁ niż P₂, mających W, ma S.
+     * Jak forma 3, ale z kwalifikatorem W.
+     */
+    public static double[] evaluateT1MultiForm4(List<DataEntity> records,
+                                                 FuzzyStatement subjectP1, FuzzyStatement subjectP2,
+                                                 FuzzyStatement qualifier,
+                                                 List<FuzzyStatement> summarizers) {
+        double r1 = computeSubjectSummarizerRatio(records, subjectP1, qualifier, summarizers);
+        double r2 = computeSubjectSummarizerRatio(records, subjectP2, qualifier, summarizers);
+        double t1More = (r1 > r2) ? 1.0 : 0.0;
+        double t1Less = (r1 < r2) ? 1.0 : 0.0;
+        return new double[]{t1More, t1Less};
+    }
+
+    /**
+     * Oblicza proporcję r = Σ min(µ_S(x), µ_P(x), [µ_W(x)]) / Σ µ_P(x)
+     * dla danego podmiotu P, opcjonalnego kwalifikatora W i sumaryzatorów S.
+     */
+    private static double computeSubjectSummarizerRatio(List<DataEntity> records,
+                                                         FuzzyStatement subject,
+                                                         FuzzyStatement qualifier,
+                                                         List<FuzzyStatement> summarizers) {
+        double numerator = 0.0;
+        double denominator = 0.0;
+        for (DataEntity record : records) {
+            double muP = evaluateSingleMembership(record, subject);
+            if (muP <= 0.0) continue;
+            denominator += muP;
+
+            double muS = evaluateCombinedMembership(record, summarizers);
+            double combined = Math.min(muS, muP);
+            if (qualifier != null) {
+                double muW = evaluateSingleMembership(record, qualifier);
+                combined = Math.min(combined, muW);
+            }
+            numerator += combined;
+        }
+        return denominator == 0.0 ? 0.0 : numerator / denominator;
+    }
+
+    // ==================== Miary jednopodmiotowe ====================
+
     public static double evaluateT2(List<FuzzyStatement> summarizers) {
         double product = 1.0;
         for (FuzzyStatement sum : summarizers) {
@@ -119,7 +208,7 @@ public class QualityEvaluator {
         return degreeOfImprecision(qualifier.getFuzzySet());
     }
 
-    private static double evaluateCombinedMembership(DataEntity record, List<FuzzyStatement> summarizers) {
+    static double evaluateCombinedMembership(DataEntity record, List<FuzzyStatement> summarizers) {
         double result = 1.0;
         for (FuzzyStatement s : summarizers) {
             result = Math.min(result, evaluateSingleMembership(record, s));
@@ -127,7 +216,7 @@ public class QualityEvaluator {
         return result;
     }
 
-    private static double evaluateSingleMembership(DataEntity record, FuzzyStatement statement) {
+    static double evaluateSingleMembership(DataEntity record, FuzzyStatement statement) {
         String attr = statement.getAttributeName();
         if (record.getNumericAttributes().containsKey(attr)) {
             double val = record.getAttribute(attr);

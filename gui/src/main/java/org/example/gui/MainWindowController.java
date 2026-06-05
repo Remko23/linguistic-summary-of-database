@@ -77,6 +77,23 @@ public class MainWindowController {
     private TableView<LabelDefinition> labelsTable;
 
     @FXML
+    private ComboBox<String> multiP1AttrCombo;
+    @FXML
+    private ComboBox<String> multiP1LabelCombo;
+    @FXML
+    private ComboBox<String> multiP2AttrCombo;
+    @FXML
+    private ComboBox<String> multiP2LabelCombo;
+    @FXML
+    private CheckBox multiForm1Check;
+    @FXML
+    private CheckBox multiForm2Check;
+    @FXML
+    private CheckBox multiForm3Check;
+    @FXML
+    private CheckBox multiForm4Check;
+
+    @FXML
     private Label statusLabel;
 
     private final RecordRepository repository = new JdbcRecordRepository();
@@ -137,6 +154,7 @@ public class MainWindowController {
         buildAdvancedView();
         buildLabelsTableColumns();
         populateLabelDefinitionsFromFcl();
+        buildMultiSubjectCombos();
 
         statusLabel.setText("Gotowy. Wybierz konfigurację i wygeneruj podsumowania.");
     }
@@ -618,6 +636,180 @@ public class MainWindowController {
         statusLabel.setText(advanced
                 ? "Widok zaawansowany"
                 : "Widok podstawowy");
+    }
+
+    // ==================== Wielopodmiotowe ====================
+
+    private void buildMultiSubjectCombos() {
+        List<String> attrNames = new ArrayList<>();
+        for (LinguisticVariable var : allVariables) {
+            String name = var.getAttributeName();
+            if (!name.equals("kwantyfikator_wzgledny") && !name.equals("kwantyfikator_bezwzgledny")) {
+                String display = ATTR_DISPLAY_NAMES.getOrDefault(name, name);
+                attrNames.add(display);
+            }
+        }
+        ObservableList<String> attrItems = FXCollections.observableArrayList(attrNames);
+        multiP1AttrCombo.setItems(FXCollections.observableArrayList(attrItems));
+        multiP2AttrCombo.setItems(FXCollections.observableArrayList(attrItems));
+    }
+
+    @FXML
+    private void handleMultiP1AttrChange(ActionEvent event) {
+        updateMultiLabelCombo(multiP1AttrCombo, multiP1LabelCombo);
+    }
+
+    @FXML
+    private void handleMultiP2AttrChange(ActionEvent event) {
+        updateMultiLabelCombo(multiP2AttrCombo, multiP2LabelCombo);
+    }
+
+    private void updateMultiLabelCombo(ComboBox<String> attrCombo, ComboBox<String> labelCombo) {
+        labelCombo.getItems().clear();
+        String selectedDisplay = attrCombo.getValue();
+        if (selectedDisplay == null) return;
+
+        String attrKey = getAttrKeyByDisplay(selectedDisplay);
+        if (attrKey == null) return;
+
+        for (LinguisticVariable var : allVariables) {
+            if (var.getAttributeName().equals(attrKey)) {
+                for (String label : var.getLabels()) {
+                    labelCombo.getItems().add(label.replace("_", " "));
+                }
+                break;
+            }
+        }
+        if (!labelCombo.getItems().isEmpty()) {
+            labelCombo.getSelectionModel().selectFirst();
+        }
+    }
+
+    private String getAttrKeyByDisplay(String displayName) {
+        for (Map.Entry<String, String> e : ATTR_DISPLAY_NAMES.entrySet()) {
+            if (e.getValue().equals(displayName)) return e.getKey();
+        }
+        return displayName;
+    }
+
+    private FuzzyStatement buildSubjectStatement(ComboBox<String> attrCombo, ComboBox<String> labelCombo) {
+        String attrDisplay = attrCombo.getValue();
+        String labelDisplay = labelCombo.getValue();
+        if (attrDisplay == null || labelDisplay == null) return null;
+
+        String attrKey = getAttrKeyByDisplay(attrDisplay);
+        String labelKey = labelDisplay.replace(" ", "_");
+
+        for (LinguisticVariable var : allVariables) {
+            if (var.getAttributeName().equals(attrKey)) {
+                for (String l : var.getLabels()) {
+                    if (l.equals(labelKey)) {
+                        return new FuzzyStatement(attrKey, l, var.getLabelSet(l));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @FXML
+    private void handleGenerateMultiSubject(ActionEvent event) {
+        statusLabel.setText("Generowanie podsumowań wielopodmiotowych...");
+
+        // Walidacja podmiotów
+        FuzzyStatement p1 = buildSubjectStatement(multiP1AttrCombo, multiP1LabelCombo);
+        FuzzyStatement p2 = buildSubjectStatement(multiP2AttrCombo, multiP2LabelCombo);
+        if (p1 == null || p2 == null) {
+            showAlert("Brak podmiotów", "Wybierz atrybut i etykietę dla obu podmiotów P₁ i P₂.");
+            return;
+        }
+
+        // Budowanie nazw czytelnych
+        String p1Name = ATTR_DISPLAY_NAMES.getOrDefault(p1.getAttributeName(), p1.getAttributeName())
+                + " " + p1.getLabel().replace("_", " ");
+        String p2Name = ATTR_DISPLAY_NAMES.getOrDefault(p2.getAttributeName(), p2.getAttributeName())
+                + " " + p2.getLabel().replace("_", " ");
+
+        // Formy
+        boolean[] enabledForms = {
+                multiForm1Check.isSelected(),
+                multiForm2Check.isSelected(),
+                multiForm3Check.isSelected(),
+                multiForm4Check.isSelected()
+        };
+        if (!enabledForms[0] && !enabledForms[1] && !enabledForms[2] && !enabledForms[3]) {
+            showAlert("Brak form", "Wybierz co najmniej jedną formę podsumowania wielopodmiotowego.");
+            return;
+        }
+
+        // Kwantyfikatory (formy 1-2 potrzebują względnych)
+        List<Quantifier> selectedQuantifiers = new ArrayList<>();
+        if (enabledForms[0] || enabledForms[1]) {
+            for (Map.Entry<CheckBox, Quantifier> e : quantifierMap.entrySet()) {
+                if (e.getKey().isSelected() && e.getValue() instanceof RelativeQuantifier) {
+                    selectedQuantifiers.add(e.getValue());
+                }
+            }
+            if (selectedQuantifiers.isEmpty()) {
+                showAlert("Brak kwantyfikatorów", "Formy 1 i 2 wymagają kwantyfikatorów względnych. Zaznacz co najmniej jeden.");
+                return;
+            }
+        }
+
+        // Sumaryzatory
+        List<FuzzyStatement> selectedSummarizers = new ArrayList<>();
+        for (Map.Entry<CheckBox, FuzzyStatement> e : summarizerMap.entrySet()) {
+            if (e.getKey().isSelected()) selectedSummarizers.add(e.getValue());
+        }
+        if (selectedSummarizers.isEmpty()) {
+            showAlert("Brak sumaryzatorów", "Wybierz co najmniej jeden sumaryzator.");
+            return;
+        }
+
+        // Kwalifikatory (formy 2, 4)
+        List<FuzzyStatement> selectedQualifiers = new ArrayList<>();
+        if (enabledForms[1] || enabledForms[3]) {
+            for (Map.Entry<CheckBox, FuzzyStatement> e : qualifierMap.entrySet()) {
+                if (e.getKey().isSelected()) selectedQualifiers.add(e.getValue());
+            }
+            if (selectedQualifiers.isEmpty()) {
+                showAlert("Brak kwalifikatorów", "Formy 2 i 4 wymagają kwalifikatorów. Zaznacz co najmniej jeden.");
+                return;
+            }
+        }
+
+        // Pobranie danych
+        List<DataEntity> records;
+        try {
+            records = repository.getAllRecords();
+        } catch (Exception e) {
+            showAlert("Błąd bazy danych", "Nie udało się załadować danych: " + e.getMessage());
+            return;
+        }
+        if (records.isEmpty()) {
+            showAlert("Brak danych", "Baza danych nie zwróciła żadnych rekordów.");
+            return;
+        }
+
+        // Generowanie
+        List<LinguisticSummaryDTO> summaries = generator.generateMultiSubjectAll(
+                records, p1, p2, p1Name, p2Name,
+                selectedQuantifiers, selectedQualifiers, selectedSummarizers, enabledForms);
+
+        Map<Integer, Double> weights = getWeightsFromSliders();
+        summaries = OptimalSummaryOptimizer.optimize(summaries, weights);
+
+        summaryRows.clear();
+        for (int i = 0; i < summaries.size(); i++) {
+            summaryRows.add(new SummaryRow(i + 1, summaries.get(i)));
+        }
+        FXCollections.sort(summaryRows, Comparator.comparingDouble(SummaryRow::getOverallScore).reversed());
+        for (int i = 0; i < summaryRows.size(); i++) {
+            summaryRows.get(i).indexProperty().set(i + 1);
+        }
+
+        resultCountLabel.setText(summaries.size() + " wyników");
+        statusLabel.setText("Wygenerowano " + summaries.size() + " podsumowań wielopodmiotowych (P₁=" + p1Name + ", P₂=" + p2Name + ").");
     }
 
     private void buildAdvancedView() {

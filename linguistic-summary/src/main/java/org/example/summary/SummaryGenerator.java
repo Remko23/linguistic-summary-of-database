@@ -49,45 +49,147 @@ public class SummaryGenerator {
         return results;
     }
 
-    public List<LinguisticSummaryDTO> generateMultiSubject(
-            List<DataEntity> group1,
-            List<DataEntity> group2,
-            String group1Name,
-            String group2Name,
+    /**
+     * Generuje podsumowania wielopodmiotowe we wszystkich włączonych formach (1–4).
+     *
+     * @param records       pełny zbiór danych
+     * @param subjectP1     predykat rozmyty definiujący podmiot P₁
+     * @param subjectP2     predykat rozmyty definiujący podmiot P₂
+     * @param p1Name        czytelna nazwa P₁ (np. "popularność wysoka")
+     * @param p2Name        czytelna nazwa P₂ (np. "popularność niska")
+     * @param quantifiers   kwantyfikatory względne (formy 1–2)
+     * @param qualifiers    kwalifikatory (formy 2, 4); pusta lista = brak
+     * @param summarizers   sumaryzatory
+     * @param enabledForms  tablica boolean[4] — włączone formy [form1, form2, form3, form4]
+     */
+    public List<LinguisticSummaryDTO> generateMultiSubjectAll(
+            List<DataEntity> records,
+            FuzzyStatement subjectP1,
+            FuzzyStatement subjectP2,
+            String p1Name,
+            String p2Name,
             List<Quantifier> quantifiers,
-            List<FuzzyStatement> summarizers) {
+            List<FuzzyStatement> qualifiers,
+            List<FuzzyStatement> summarizers,
+            boolean[] enabledForms) {
 
         List<LinguisticSummaryDTO> results = new ArrayList<>();
 
-        for (Quantifier q : quantifiers) {
-            for (FuzzyStatement sumVar : summarizers) {
-                List<FuzzyStatement> sumList = Collections.singletonList(sumVar);
+        for (FuzzyStatement sumVar : summarizers) {
+            List<FuzzyStatement> sumList = Collections.singletonList(sumVar);
+            String sumDesc = mapAttributeName(sumVar.getAttributeName()) + " " + sumVar.getLabel().replace("_", " ");
 
-                String text = String.format("%s artykułów z grupy %s w porównaniu do %s ma %s %s",
-                        mapQuantifierName(q.getName()), group1Name, group2Name,
-                        mapAttributeName(sumVar.getAttributeName()), sumVar.getLabel().replace("_", " "));
+            // ---- Forma 1: Q P₁ w porównaniu do P₂ ma S ----
+            if (enabledForms[0]) {
+                for (Quantifier q : quantifiers) {
+                    String qName = mapQuantifierName(q.getName());
+                    qName = qName.substring(0, 1).toUpperCase() + qName.substring(1);
+                    String text = String.format("%s artykułów będących %s w porównaniu do %s ma %s.",
+                            qName, p1Name, p2Name, sumDesc);
 
-                LinguisticSummaryDTO dto = new LinguisticSummaryDTO(text);
+                    LinguisticSummaryDTO dto = new LinguisticSummaryDTO(text);
+                    dto.setMeasure(1, QualityEvaluator.evaluateT1MultiForm1(records, subjectP1, subjectP2, q, sumList));
+                    fillCommonMeasures(dto, records, q, null, sumList);
+                    results.add(dto);
+                }
+            }
 
-                double t1 = QualityEvaluator.evaluateT1(group1, q, null, sumList);
-                double t2 = QualityEvaluator.evaluateT1(group2, q, null, sumList);
+            // ---- Forma 2: Q P₁ w porównaniu do P₂, mających W, ma S ----
+            if (enabledForms[1]) {
+                for (Quantifier q : quantifiers) {
+                    for (FuzzyStatement qual : qualifiers) {
+                        String qName = mapQuantifierName(q.getName());
+                        qName = qName.substring(0, 1).toUpperCase() + qName.substring(1);
+                        String qualDesc = mapAttributeName(qual.getAttributeName()) + " " + qual.getLabel().replace("_", " ");
+                        String text = String.format("%s artykułów będących %s w porównaniu do %s, mających %s, ma %s.",
+                                qName, p1Name, p2Name, qualDesc, sumDesc);
 
-                dto.setMeasure(1, Math.max(t1, t2));
-                dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
-                dto.setMeasure(3, 0.5);
-                dto.setMeasure(4, QualityEvaluator.evaluateT4(group1, null, sumList));
-                dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
-                dto.setMeasure(6, QualityEvaluator.evaluateT6(q));
-                dto.setMeasure(7, QualityEvaluator.evaluateT7(q));
-                dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
-                dto.setMeasure(9, 0.0);
-                dto.setMeasure(10, 0.0);
-                dto.setMeasure(11, 0.0);
+                        LinguisticSummaryDTO dto = new LinguisticSummaryDTO(text);
+                        dto.setMeasure(1, QualityEvaluator.evaluateT1MultiForm2(records, subjectP1, subjectP2, q, qual, sumList));
+                        fillCommonMeasures(dto, records, q, qual, sumList);
+                        results.add(dto);
+                    }
+                }
+            }
 
-                results.add(dto);
+            // ---- Forma 3: Więcej/Mniej P₁ niż P₂ ma S ----
+            if (enabledForms[2]) {
+                double[] t1vals = QualityEvaluator.evaluateT1MultiForm3(records, subjectP1, subjectP2, sumList);
+
+                // Zdanie "Więcej"
+                String textMore = String.format("Więcej artykułów będących %s niż %s ma %s.", p1Name, p2Name, sumDesc);
+                LinguisticSummaryDTO dtoMore = new LinguisticSummaryDTO(textMore);
+                dtoMore.setMeasure(1, t1vals[0]);
+                fillCommonMeasuresNoQuantifier(dtoMore, records, null, sumList);
+                results.add(dtoMore);
+
+                // Zdanie "Mniej"
+                String textLess = String.format("Mniej artykułów będących %s niż %s ma %s.", p1Name, p2Name, sumDesc);
+                LinguisticSummaryDTO dtoLess = new LinguisticSummaryDTO(textLess);
+                dtoLess.setMeasure(1, t1vals[1]);
+                fillCommonMeasuresNoQuantifier(dtoLess, records, null, sumList);
+                results.add(dtoLess);
+            }
+
+            // ---- Forma 4: Więcej/Mniej P₁ niż P₂, mających W, ma S ----
+            if (enabledForms[3]) {
+                for (FuzzyStatement qual : qualifiers) {
+                    String qualDesc = mapAttributeName(qual.getAttributeName()) + " " + qual.getLabel().replace("_", " ");
+                    double[] t1vals = QualityEvaluator.evaluateT1MultiForm4(records, subjectP1, subjectP2, qual, sumList);
+
+                    String textMore = String.format("Więcej artykułów będących %s niż %s, mających %s, ma %s.",
+                            p1Name, p2Name, qualDesc, sumDesc);
+                    LinguisticSummaryDTO dtoMore = new LinguisticSummaryDTO(textMore);
+                    dtoMore.setMeasure(1, t1vals[0]);
+                    fillCommonMeasuresNoQuantifier(dtoMore, records, qual, sumList);
+                    results.add(dtoMore);
+
+                    String textLess = String.format("Mniej artykułów będących %s niż %s, mających %s, ma %s.",
+                            p1Name, p2Name, qualDesc, sumDesc);
+                    LinguisticSummaryDTO dtoLess = new LinguisticSummaryDTO(textLess);
+                    dtoLess.setMeasure(1, t1vals[1]);
+                    fillCommonMeasuresNoQuantifier(dtoLess, records, qual, sumList);
+                    results.add(dtoLess);
+                }
             }
         }
+
         return results;
+    }
+
+    /**
+     * Wypełnia miary T₂–T₁₁ dla form z kwantyfikatorem (formy 1, 2).
+     */
+    private void fillCommonMeasures(LinguisticSummaryDTO dto, List<DataEntity> records,
+                                     Quantifier q, FuzzyStatement qual, List<FuzzyStatement> sumList) {
+        dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
+        dto.setMeasure(3, QualityEvaluator.evaluateT3(records, qual, sumList));
+        dto.setMeasure(4, QualityEvaluator.evaluateT4(records, qual, sumList));
+        dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
+        dto.setMeasure(6, QualityEvaluator.evaluateT6(q));
+        dto.setMeasure(7, QualityEvaluator.evaluateT7(q));
+        dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
+        dto.setMeasure(9, QualityEvaluator.evaluateT9(qual));
+        dto.setMeasure(10, QualityEvaluator.evaluateT10(qual));
+        dto.setMeasure(11, QualityEvaluator.evaluateT11(qual));
+    }
+
+    /**
+     * Wypełnia miary T₂–T₁₁ dla form bez kwantyfikatora (formy 3, 4).
+     * T₆ i T₇ ustawiane na 0, bo nie ma kwantyfikatora.
+     */
+    private void fillCommonMeasuresNoQuantifier(LinguisticSummaryDTO dto, List<DataEntity> records,
+                                                 FuzzyStatement qual, List<FuzzyStatement> sumList) {
+        dto.setMeasure(2, QualityEvaluator.evaluateT2(sumList));
+        dto.setMeasure(3, QualityEvaluator.evaluateT3(records, qual, sumList));
+        dto.setMeasure(4, QualityEvaluator.evaluateT4(records, qual, sumList));
+        dto.setMeasure(5, QualityEvaluator.evaluateT5(sumList));
+        dto.setMeasure(6, 0.0);
+        dto.setMeasure(7, 0.0);
+        dto.setMeasure(8, QualityEvaluator.evaluateT8(sumList));
+        dto.setMeasure(9, QualityEvaluator.evaluateT9(qual));
+        dto.setMeasure(10, QualityEvaluator.evaluateT10(qual));
+        dto.setMeasure(11, QualityEvaluator.evaluateT11(qual));
     }
 
     private String buildSentence(String quantifier, FuzzyStatement qualifier, FuzzyStatement summarizer) {

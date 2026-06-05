@@ -51,6 +51,37 @@
                     </TitledPane>
 
                     <Separator/>
+
+                    <TitledPane text="Podsumowania wielopodmiotowe" animated="false" expanded="false">
+                      <content>
+                        <VBox spacing="8">
+                          <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                          </padding>
+                          <children>
+                            <Label text="Podmiot P₁:" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                            <ComboBox fx:id="multiP1AttrCombo" maxWidth="Infinity" promptText="Atrybut P₁" onAction="#handleMultiP1AttrChange"/>
+                            <ComboBox fx:id="multiP1LabelCombo" maxWidth="Infinity" promptText="Etykieta P₁"/>
+
+                            <Label text="Podmiot P₂:" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                            <ComboBox fx:id="multiP2AttrCombo" maxWidth="Infinity" promptText="Atrybut P₂" onAction="#handleMultiP2AttrChange"/>
+                            <ComboBox fx:id="multiP2LabelCombo" maxWidth="Infinity" promptText="Etykieta P₂"/>
+
+                            <Separator/>
+                            <Label text="Formy podsumowań:" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                            <CheckBox fx:id="multiForm1Check" text="Forma 1 — Q P₁ vs P₂ ma S" selected="true"/>
+                            <CheckBox fx:id="multiForm2Check" text="Forma 2 — Q P₁ vs P₂, mających W, ma S"/>
+                            <CheckBox fx:id="multiForm3Check" text="Forma 3 — Więcej/Mniej P₁ niż P₂ ma S" selected="true"/>
+                            <CheckBox fx:id="multiForm4Check" text="Forma 4 — Więcej/Mniej P₁ vs P₂, mających W, ma S"/>
+
+                            <Separator/>
+                            <Button text="Generuj wielopodmiotowe" onAction="#handleGenerateMultiSubject" maxWidth="Infinity" styleClass="button-success"/>
+                          </children>
+                        </VBox>
+                      </content>
+                    </TitledPane>
+
+                    <Separator/>
                     <Button text="Generuj podsumowania" onAction="#handleGenerate" maxWidth="Infinity"/>
                   </children>
                 </VBox>
