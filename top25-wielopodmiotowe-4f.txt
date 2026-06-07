@@ -1,0 +1,103 @@
+Sortowanie: T (Ogólny)
+Wagi: {1=1.0, 2=0.5, 3=0.35, 4=0.4, 5=0.1, 6=0.25, 7=0.25, 8=0.25, 9=0.25, 10=0.25, 11=0.25}
+
+1. T=0.6379
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu pozytywny, ma współczynnik subiektywności artykułu subiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.7975,    T4=0.2816,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6900,    T10=0.7772,    T11=0.3100
+
+2. T=0.6286
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających bogactwo źródeł srednie, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8611,    T4=0.0188,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.9520,    T10=0.9655,    T11=0.0480
+
+3. T=0.6260
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu bardzo pozytywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.3600,    T4=0.4823,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8420,    T10=0.8852,    T11=0.1580
+
+4. T=0.6254
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających bogactwo źródeł ubogie, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8442,    T4=0.0018,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.9620,    T10=0.9662,    T11=0.0380
+
+5. T=0.6240
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających unikalność słów artykułu pospolity, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8879,    T4=0.0456,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.7320,    T10=0.8140,    T11=0.2680
+
+6. T=0.6229
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających atrakcyjność wizualna surowa, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8520,    T4=0.0097,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8920,    T10=0.9054,    T11=0.1080
+
+7. T=0.6226
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających atrakcyjność wizualna zbalansowana, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.7449,    T4=0.0975,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8600,    T10=0.9103,    T11=0.1400
+
+8. T=0.6217
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu bardzo negatywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.5268,    T4=0.3156,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8320,    T10=0.8520,    T11=0.1680
+
+9. T=0.6205
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik subiektywności tytułu bardzo obiektywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8666,    T4=0.0242,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8020,    T10=0.8244,    T11=0.1980
+
+10. T=0.6187
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik subiektywności tytułu bardzo subiektywny, ma współczynnik subiektywności artykułu subiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.6826,    T4=0.1667,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8020,    T10=0.8263,    T11=0.1980
+
+11. T=0.6178
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu neutralny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8760,    T4=0.0336,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6460,    T10=0.7550,    T11=0.3540
+
+12. T=0.6177
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik subiektywności tytułu bardzo subiektywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.7078,    T4=0.1346,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8020,    T10=0.8263,    T11=0.1980
+
+13. T=0.6169
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu pozytywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.5177,    T4=0.3246,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6900,    T10=0.7772,    T11=0.3100
+
+14. T=0.6163
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających średnia długość słowa mala, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8692,    T4=0.0268,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6860,    T10=0.7517,    T11=0.3140
+
+15. T=0.6162
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających atrakcyjność wizualna zbalansowana, ma współczynnik subiektywności artykułu subiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.6419,    T4=0.1260,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8600,    T10=0.9103,    T11=0.1400
+
+16. T=0.6143
+   "Mniej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu negatywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8345,    T4=0.0079,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6900,    T10=0.7995,    T11=0.3100
+
+17. T=0.6142
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu bardzo pozytywny, ma współczynnik subiektywności artykułu subiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.6400,    T4=0.1241,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.8420,    T10=0.8852,    T11=0.1580
+
+18. T=0.6129
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik subiektywności tytułu obiektywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8687,    T4=0.0263,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.5520,    T10=0.7006,    T11=0.4480
+
+19. T=0.6121
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego artykułu bardzo pozytywny, ma współczynnik subiektywności artykułu bardzo subiektywny."
+   T1=1.0000,    T2=0.7520,    T3=0.2800,    T4=0.2769,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.8014,    T9=0.8420,    T10=0.8852,    T11=0.1580
+
+20. T=0.6112
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających unikalność słów artykułu sredni, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8726,    T4=0.0302,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.4960,    T10=0.6636,    T11=0.5040
+
+21. T=0.6093
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik nacechowania emocjonalnego tytułu pozytywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.7869,    T4=0.0554,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6280,    T10=0.7141,    T11=0.3720
+
+22. T=0.6084
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających średnia długość słowa srednia, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8693,    T4=0.0270,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.4620,    T10=0.6291,    T11=0.5380
+
+23. T=0.6081
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających współczynnik subiektywności tytułu subiektywny, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8189,    T4=0.0235,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.5520,    T10=0.7006,    T11=0.4480
+
+24. T=0.6077
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających średnia długość słowa duza, ma współczynnik subiektywności artykułu obiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.8333,    T4=0.0090,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6100,    T10=0.6978,    T11=0.3900
+
+25. T=0.6073
+   "Więcej artykułów będących Stosunek pozytywnych słów wysoki niż Popularność bardzo popularny, mających średnia długość słowa duza, ma współczynnik subiektywności artykułu subiektywny."
+   T1=1.0000,    T2=0.6520,    T3=0.6667,    T4=0.1508,    T5=1.0000,    T6=0.0000,    T7=0.0000,    T8=0.7754,    T9=0.6100,    T10=0.6978,    T11=0.3900
+
