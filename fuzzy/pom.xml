@@ -19,6 +19,8 @@
             <groupId>net.sourceforge</groupId>
             <artifactId>jfuzzylogic</artifactId>
             <version>1.2.1</version>
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/../jFuzzyLogic.jar</systemPath>-->
         </dependency>
     </dependencies>
 
