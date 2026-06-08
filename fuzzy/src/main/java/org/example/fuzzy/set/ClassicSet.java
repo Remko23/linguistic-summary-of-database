@@ -2,9 +2,6 @@ package org.example.fuzzy.set;
 
 import java.util.Set;
 
-/**
- * Represents a classical (crisp) set, defining a space of discourse or explicit subsets.
- */
 public class ClassicSet {
     private final double minBound;
     private final double maxBound;
@@ -33,8 +30,19 @@ public class ClassicSet {
         }
     }
 
-    public double getMinBound() { return minBound; }
-    public double getMaxBound() { return maxBound; }
-    public Set<Double> getDiscreteElements() { return discreteElements; }
-    public boolean isContinuous() { return isContinuous; }
+    public double getMinBound() {
+        return minBound;
+    }
+
+    public double getMaxBound() {
+        return maxBound;
+    }
+
+    public Set<Double> getDiscreteElements() {
+        return discreteElements;
+    }
+
+    public boolean isContinuous() {
+        return isContinuous;
+    }
 }

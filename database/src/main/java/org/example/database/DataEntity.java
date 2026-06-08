@@ -3,10 +3,6 @@ package org.example.database;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Represents a single database record with multiple numerical attributes.
- * These attributes will be extracted and evaluated using fuzzy logic.
- */
 public class DataEntity {
     private final int id;
     private final String label;

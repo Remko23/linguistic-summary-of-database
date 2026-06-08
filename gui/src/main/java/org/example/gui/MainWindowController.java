@@ -638,8 +638,6 @@ public class MainWindowController {
                 : "Widok podstawowy");
     }
 
-    // ==================== Wielopodmiotowe ====================
-
     private void buildMultiSubjectCombos() {
         List<String> attrNames = new ArrayList<>();
         for (LinguisticVariable var : allVariables) {
@@ -667,10 +665,12 @@ public class MainWindowController {
     private void updateMultiLabelCombo(ComboBox<String> attrCombo, ComboBox<String> labelCombo) {
         labelCombo.getItems().clear();
         String selectedDisplay = attrCombo.getValue();
-        if (selectedDisplay == null) return;
+        if (selectedDisplay == null)
+            return;
 
         String attrKey = getAttrKeyByDisplay(selectedDisplay);
-        if (attrKey == null) return;
+        if (attrKey == null)
+            return;
 
         for (LinguisticVariable var : allVariables) {
             if (var.getAttributeName().equals(attrKey)) {
@@ -687,7 +687,8 @@ public class MainWindowController {
 
     private String getAttrKeyByDisplay(String displayName) {
         for (Map.Entry<String, String> e : ATTR_DISPLAY_NAMES.entrySet()) {
-            if (e.getValue().equals(displayName)) return e.getKey();
+            if (e.getValue().equals(displayName))
+                return e.getKey();
         }
         return displayName;
     }
@@ -695,7 +696,8 @@ public class MainWindowController {
     private FuzzyStatement buildSubjectStatement(ComboBox<String> attrCombo, ComboBox<String> labelCombo) {
         String attrDisplay = attrCombo.getValue();
         String labelDisplay = labelCombo.getValue();
-        if (attrDisplay == null || labelDisplay == null) return null;
+        if (attrDisplay == null || labelDisplay == null)
+            return null;
 
         String attrKey = getAttrKeyByDisplay(attrDisplay);
         String labelKey = labelDisplay.replace(" ", "_");
@@ -716,7 +718,6 @@ public class MainWindowController {
     private void handleGenerateMultiSubject(ActionEvent event) {
         statusLabel.setText("Generowanie podsumowań wielopodmiotowych...");
 
-        // Walidacja podmiotów
         FuzzyStatement p1 = buildSubjectStatement(multiP1AttrCombo, multiP1LabelCombo);
         FuzzyStatement p2 = buildSubjectStatement(multiP2AttrCombo, multiP2LabelCombo);
         if (p1 == null || p2 == null) {
@@ -724,13 +725,11 @@ public class MainWindowController {
             return;
         }
 
-        // Budowanie nazw czytelnych
         String p1Name = ATTR_DISPLAY_NAMES.getOrDefault(p1.getAttributeName(), p1.getAttributeName())
                 + " " + p1.getLabel().replace("_", " ");
         String p2Name = ATTR_DISPLAY_NAMES.getOrDefault(p2.getAttributeName(), p2.getAttributeName())
                 + " " + p2.getLabel().replace("_", " ");
 
-        // Formy
         boolean[] enabledForms = {
                 multiForm1Check.isSelected(),
                 multiForm2Check.isSelected(),
@@ -742,7 +741,6 @@ public class MainWindowController {
             return;
         }
 
-        // Kwantyfikatory (formy 1-2 potrzebują względnych)
         List<Quantifier> selectedQuantifiers = new ArrayList<>();
         if (enabledForms[0] || enabledForms[1]) {
             for (Map.Entry<CheckBox, Quantifier> e : quantifierMap.entrySet()) {
@@ -751,26 +749,27 @@ public class MainWindowController {
                 }
             }
             if (selectedQuantifiers.isEmpty()) {
-                showAlert("Brak kwantyfikatorów", "Formy 1 i 2 wymagają kwantyfikatorów względnych. Zaznacz co najmniej jeden.");
+                showAlert("Brak kwantyfikatorów",
+                        "Formy 1 i 2 wymagają kwantyfikatorów względnych. Zaznacz co najmniej jeden.");
                 return;
             }
         }
 
-        // Sumaryzatory
         List<FuzzyStatement> selectedSummarizers = new ArrayList<>();
         for (Map.Entry<CheckBox, FuzzyStatement> e : summarizerMap.entrySet()) {
-            if (e.getKey().isSelected()) selectedSummarizers.add(e.getValue());
+            if (e.getKey().isSelected())
+                selectedSummarizers.add(e.getValue());
         }
         if (selectedSummarizers.isEmpty()) {
             showAlert("Brak sumaryzatorów", "Wybierz co najmniej jeden sumaryzator.");
             return;
         }
 
-        // Kwalifikatory (formy 2, 4)
         List<FuzzyStatement> selectedQualifiers = new ArrayList<>();
         if (enabledForms[1] || enabledForms[3]) {
             for (Map.Entry<CheckBox, FuzzyStatement> e : qualifierMap.entrySet()) {
-                if (e.getKey().isSelected()) selectedQualifiers.add(e.getValue());
+                if (e.getKey().isSelected())
+                    selectedQualifiers.add(e.getValue());
             }
             if (selectedQualifiers.isEmpty()) {
                 showAlert("Brak kwalifikatorów", "Formy 2 i 4 wymagają kwalifikatorów. Zaznacz co najmniej jeden.");
@@ -778,7 +777,6 @@ public class MainWindowController {
             }
         }
 
-        // Pobranie danych
         List<DataEntity> records;
         try {
             records = repository.getAllRecords();
@@ -791,7 +789,6 @@ public class MainWindowController {
             return;
         }
 
-        // Generowanie
         List<LinguisticSummaryDTO> summaries = generator.generateMultiSubjectAll(
                 records, p1, p2, p1Name, p2Name,
                 selectedQuantifiers, selectedQualifiers, selectedSummarizers, enabledForms);
@@ -809,7 +806,8 @@ public class MainWindowController {
         }
 
         resultCountLabel.setText(summaries.size() + " wyników");
-        statusLabel.setText("Wygenerowano " + summaries.size() + " podsumowań wielopodmiotowych (P₁=" + p1Name + ", P₂=" + p2Name + ").");
+        statusLabel.setText("Wygenerowano " + summaries.size() + " podsumowań wielopodmiotowych (P₁=" + p1Name + ", P₂="
+                + p2Name + ").");
     }
 
     private void buildAdvancedView() {
@@ -1028,7 +1026,8 @@ public class MainWindowController {
     }
 
     private String escapeJson(String s) {
-        if (s == null) return "";
+        if (s == null)
+            return "";
         return s.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")

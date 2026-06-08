@@ -8,11 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Binds a specific database attribute to a set of linguistic labels
- * Each label maps to a corresponding FuzzySet definition.
- * Internally wraps jFuzzyLogic's Variable and LinguisticTerm classes.
- */
 public class LinguisticVariable {
     private final Variable internalVariable;
     private final Map<String, FuzzySet> labels;
@@ -22,9 +17,6 @@ public class LinguisticVariable {
         this.labels = new HashMap<>();
     }
 
-    /**
-     * Adds a linguistic label with its associated FuzzySet.
-     */
     public void addLabel(String labelName, FuzzySet set) {
         labels.put(labelName, set);
         LinguisticTerm term = new LinguisticTerm(labelName, set.getMembershipFunction());
