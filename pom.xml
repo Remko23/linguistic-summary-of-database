@@ -11,7 +11,6 @@
 
     <modules>
         <module>gui</module>
-        <module>tui</module>
         <module>linguistic-summary</module>
         <module>fuzzy</module>
         <module>database</module>
