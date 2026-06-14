@@ -3,11 +3,6 @@ package org.example.summary;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Data Transfer Object encapsulating a single generated linguistic summary.
- * It contains the textual statement, the individual quality measures (T1 to T11),
- * and the aggregated weighted quality score.
- */
 public class LinguisticSummaryDTO {
     private final String summaryText;
     private final Map<Integer, Double> qualityMeasures;
