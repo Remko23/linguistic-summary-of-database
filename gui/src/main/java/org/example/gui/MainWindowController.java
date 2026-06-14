@@ -62,7 +62,7 @@ public class MainWindowController {
     @FXML
     private ComboBox<LabelDefinition.LabelType> advTypeCombo;
     @FXML
-    private TextField advAttributeField;
+    private ComboBox<String> advAttributeCombo;
     @FXML
     private TextField advLabelField;
     @FXML
@@ -815,7 +815,12 @@ public class MainWindowController {
         advTypeCombo.getSelectionModel().selectFirst();
         advMfCombo.setItems(FXCollections.observableArrayList(LabelDefinition.MfType.values()));
         advMfCombo.getSelectionModel().selectFirst();
+
+        advAttributeCombo.setItems(FXCollections.observableArrayList(ATTR_DISPLAY_NAMES.values()));
+        advAttributeCombo.getSelectionModel().selectFirst();
+
         updateAdvParamFields();
+        updateAdvUniverseFields();
     }
 
     @SuppressWarnings("unchecked")
@@ -879,6 +884,48 @@ public class MainWindowController {
         updateAdvParamFields();
     }
 
+    @FXML
+    private void handleAdvTypeChange(ActionEvent event) {
+        updateAdvUniverseFields();
+    }
+
+    @FXML
+    private void handleAdvAttributeChange(ActionEvent event) {
+        updateAdvUniverseFields();
+    }
+
+    private void updateAdvUniverseFields() {
+        LabelDefinition.LabelType type = advTypeCombo.getValue();
+        if (type == null) return;
+
+        String varName = "";
+        if (type == LabelDefinition.LabelType.RELATIVE_QUANTIFIER) {
+            advUnivMinField.setText("0.0");
+            advUnivMaxField.setText("1.0");
+            advAttributeCombo.setDisable(true);
+            return;
+        } else if (type == LabelDefinition.LabelType.ABSOLUTE_QUANTIFIER) {
+            varName = "kwantyfikator_bezwzgledny";
+            advAttributeCombo.setDisable(true);
+        } else {
+            String attrDisplay = advAttributeCombo.getValue();
+            varName = attrDisplay != null ? getAttrKeyByDisplay(attrDisplay) : "";
+            advAttributeCombo.setDisable(false);
+        }
+
+        for (LinguisticVariable v : allVariables) {
+            if (v.getAttributeName().equals(varName)) {
+                if (!v.getLabels().isEmpty()) {
+                    String firstLabel = v.getLabels().iterator().next();
+                    FuzzySet fs = v.getLabelSet(firstLabel);
+                    advUnivMinField.setText(String.format(Locale.US, "%.1f", fs.getUniverse().getMinBound()));
+                    advUnivMaxField.setText(String.format(Locale.US, "%.1f", fs.getUniverse().getMaxBound()));
+                    return;
+                }
+            }
+        }
+    }
+
     private void updateAdvParamFields() {
         advParamsContainer.getChildren().clear();
         advParamFields.clear();
@@ -915,7 +962,8 @@ public class MainWindowController {
     @FXML
     private void handleAddLabel(ActionEvent event) {
         LabelDefinition.LabelType type = advTypeCombo.getValue();
-        String attrName = advAttributeField.getText().trim();
+        String attrDisplay = advAttributeCombo.getValue();
+        String attrName = attrDisplay != null ? getAttrKeyByDisplay(attrDisplay) : "";
         String labelName = advLabelField.getText().trim();
         LabelDefinition.MfType mfType = advMfCombo.getValue();
 

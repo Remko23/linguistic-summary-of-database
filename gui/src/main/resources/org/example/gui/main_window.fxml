@@ -147,10 +147,10 @@
                     <Separator/>
 
                     <Label text="Typ:"/>
-                    <ComboBox fx:id="advTypeCombo" maxWidth="Infinity"/>
+                    <ComboBox fx:id="advTypeCombo" maxWidth="Infinity" onAction="#handleAdvTypeChange"/>
 
                     <Label text="Nazwa atrybutu:"/>
-                    <TextField fx:id="advAttributeField" promptText="np. cena"/>
+                    <ComboBox fx:id="advAttributeCombo" maxWidth="Infinity" promptText="Wybierz atrybut..." onAction="#handleAdvAttributeChange"/>
 
                     <Label text="Nazwa etykiety:"/>
                     <TextField fx:id="advLabelField" promptText="np. tani"/>
