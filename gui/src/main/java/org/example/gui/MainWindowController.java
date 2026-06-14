@@ -1042,4 +1042,64 @@ public class MainWindowController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    @FXML
+    private void handleFuzzyDemo(ActionEvent event) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("--- Prezentacja właściwości zbiorów rozmytych ---\n\n");
+
+        ClassicSet universe = new ClassicSet(0, 10);
+        TriangularMembershipFunction mf1 = new TriangularMembershipFunction(2, 5, 8);
+        FuzzySet set1 = new FuzzySet(universe, mf1);
+
+        sb.append("Zbiór A (trójkątny, [2, 5, 8] na przestrzeni [0, 10]):\n");
+        sb.append("- Pusty: ").append(set1.isEmpty()).append("\n");
+        sb.append("- Wypukły: ").append(set1.isConvex()).append("\n");
+        sb.append("- Normalny: ").append(set1.isNormal()).append("\n");
+        sb.append("- wysokość: ").append(String.format(Locale.US, "%.2f", set1.getHeight())).append("\n");
+        ClassicSet supp1 = set1.getSupport();
+        sb.append("- granice nośnika: [").append(String.format(Locale.US, "%.2f", supp1.getMinBound())).append(", ")
+                .append(String.format(Locale.US, "%.2f", supp1.getMaxBound())).append("]\n");
+        ClassicSet alpha1 = set1.getAlphaCut(0.5);
+        sb.append("- granice alfa-przekroju (0.5): [").append(String.format(Locale.US, "%.2f", alpha1.getMinBound()))
+                .append(", ")
+                .append(String.format(Locale.US, "%.2f", alpha1.getMaxBound())).append("]\n\n");
+
+        TriangularMembershipFunction mf2 = new TriangularMembershipFunction(6, 8, 10);
+        FuzzySet set2 = new FuzzySet(universe, mf2);
+        FuzzySet unionSet = set1.union(set2);
+        sb.append("Zbiór B (suma dwóch trójkątów [2,5,8] i [6,8,10] na [0, 10]):\n");
+        sb.append("- Pusty: ").append(unionSet.isEmpty()).append("\n");
+        sb.append("- Wypukły: ").append(unionSet.isConvex()).append("\n");
+        sb.append("- Normalny: ").append(unionSet.isNormal()).append("\n");
+        sb.append("- wysokość: ").append(String.format(Locale.US, "%.2f", unionSet.getHeight())).append("\n");
+        ClassicSet supp2 = unionSet.getSupport();
+        sb.append("- granice nośnika: [").append(String.format(Locale.US, "%.2f", supp2.getMinBound())).append(", ")
+                .append(String.format(Locale.US, "%.2f", supp2.getMaxBound())).append("]\n");
+        ClassicSet alpha2 = unionSet.getAlphaCut(0.5);
+        sb.append("- granice alfa-przekroju (0.5): [").append(String.format(Locale.US, "%.2f", alpha2.getMinBound()))
+                .append(", ")
+                .append(String.format(Locale.US, "%.2f", alpha2.getMaxBound())).append("]\n\n");
+
+        FuzzySet set3 = set1.intersect(new FuzzySet(universe, new TriangularMembershipFunction(11, 12, 13)));
+        sb.append("Zbiór C (pusty, iloczyn rozłącznych zbiorów trójkątnych):\n");
+        sb.append("- Pusty: ").append(set3.isEmpty()).append("\n");
+        sb.append("- Wypukły: ").append(set3.isConvex()).append("\n");
+        sb.append("- Normalny: ").append(set3.isNormal()).append("\n");
+        sb.append("- wysokość: ").append(String.format(Locale.US, "%.2f", set3.getHeight())).append("\n");
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Demo Właściwości Zbiorów Rozmytych");
+        alert.setHeaderText("Prezentacja zaimplementowanych metod (isEmpty, isConvex, itp.)");
+
+        TextArea textArea = new TextArea(sb.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+
+        alert.getDialogPane().setContent(textArea);
+        alert.getDialogPane().setPrefWidth(500);
+        alert.showAndWait();
+    }
 }

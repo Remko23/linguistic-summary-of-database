@@ -16,6 +16,7 @@
       <items>
         <Label text="KSR – Podsumowania Lingwistyczne" styleClass="header-title"/>
         <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="Demo Właściwości Zbiorów" onAction="#handleFuzzyDemo"/>
         <ToggleButton fx:id="viewToggle" text="Widok Zaawansowany" onAction="#handleToggleView"/>
       </items>
     </ToolBar>
