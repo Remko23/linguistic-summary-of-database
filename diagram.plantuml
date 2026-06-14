@@ -4,145 +4,165 @@
 top to bottom direction
 skinparam linetype ortho
 
-class AbsoluteQuantifier {
-  + AbsoluteQuantifier(String, FuzzySet):
-}
 class ClassicSet {
-  + ClassicSet(Set<Double>):
-  + ClassicSet(double, double):
   - minBound: double
+  - maxBound: double
   - discreteElements: Set<Double>
   - isContinuous: boolean
-  - maxBound: double
+  + ClassicSet(double, double)
+  + ClassicSet(Set<Double>)
   + contains(double): boolean
-   maxBound: double
-   discreteElements: Set<Double>
-   minBound: double
-   isContinuous: boolean
+  + getMinBound(): double
+  + getMaxBound(): double
+  + getDiscreteElements(): Set<Double>
+  + isContinuous(): boolean
 }
 
 class FuzzySet {
-  + FuzzySet(ClassicSet, MembershipFunction):
-  - membershipFunction: MembershipFunction
   - universe: ClassicSet
+  - membershipFunction: MembershipFunction
+  + FuzzySet(ClassicSet, MembershipFunction)
+  + getMembership(double): double
   + union(FuzzySet): FuzzySet
   + intersect(FuzzySet): FuzzySet
-  + getMembership(double): double
   + complement(): FuzzySet
-   membershipFunction: MembershipFunction
-   universe: ClassicSet
+  + getUniverse(): ClassicSet
+  + getMembershipFunction(): MembershipFunction
+  + isEmpty(): boolean
+  + isConvex(): boolean
+  + getHeight(): double
+  + isNormal(): boolean
+  + getSupport(): ClassicSet
+  + getAlphaCut(double): ClassicSet
 }
+
+interface MembershipFunction << interface >> {
+  + getMembership(double): double
+}
+
 class GaussianMembershipFunction {
-  + GaussianMembershipFunction(double, double):
-  - mean: double
-  - sigma: double
+  + GaussianMembershipFunction(double, double)
   + getMembership(double): double
   + getMean(): double
   + getSigma(): double
 }
-class LinguisticSummaryDTO {
-  + LinguisticSummaryDTO(String):
-  - summaryText: String
-  - overallScore: double
-  - qualityMeasures: Map<Integer, Double>
-  + setMeasure(int, double): void
-  + toString(): String
-  + getMeasure(int): double
-   qualityMeasures: Map<Integer, Double>
-   summaryText: String
-   overallScore: double
-}
-class LinguisticVariable {
-  + LinguisticVariable(String):
-  - attributeName: String
-  - labels: Map<String, FuzzySet>
-  + addLabel(String, FuzzySet): void
-  + getLabelSet(String): FuzzySet
-   labelsMap: Map<String, FuzzySet>
-   attributeName: String
-   labels: Set<String>
-}
-interface MembershipFunction << interface >> {
-  + getMembership(double): double
-}
-class OptimalSummaryOptimizer {
-  + OptimalSummaryOptimizer():
-  + optimize(List<LinguisticSummaryDTO>, Map<Integer, Double>): List<LinguisticSummaryDTO>
-}
-class QualityEvaluator {
-  + QualityEvaluator():
-  + evaluateT2(List<FuzzySet>): double
-  + evaluateT5(List<FuzzySet>): double
-  + evaluateT9(List<FuzzySet>): double
-  + evaluateT1(List<DataEntity>, Quantifier, FuzzySet, List<FuzzySet>): double
-  - degreeOfImprecision(FuzzySet): double
-  + evaluateT7(Quantifier): double
-  + evaluateT4(List<FuzzySet>): double
-  + evaluateT10(FuzzySet): double
-  + evaluateT8(List<FuzzySet>): double
-  - evaluateSingleMembership(DataEntity, FuzzySet): double
-  + evaluateT11(FuzzySet): double
-  + evaluateT3(List<DataEntity>, FuzzySet, List<FuzzySet>): double
-  + evaluateT6(Quantifier): double
-  - evaluateCombinedMembership(DataEntity, List<FuzzySet>): double
-}
-class Quantifier {
-  + Quantifier(String, FuzzySet):
-  # name: String
-  # fuzzySet: FuzzySet
-  + getMembership(double): double
-   name: String
-   fuzzySet: FuzzySet
-}
-class RelativeQuantifier {
-  + RelativeQuantifier(String, FuzzySet):
-}
-class FuzzyStatement {
-  + FuzzyStatement(String, String, FuzzySet):
-  - attributeName: String
-  - label: String
-  - fuzzySet: FuzzySet
-  + getAttributeName(): String
-  + getLabel(): String
-  + getFuzzySet(): FuzzySet
-}
-class SubjectPartitioner {
-  + SubjectPartitioner():
-  + split(List<DataEntity>, Predicate<DataEntity>): List<List<DataEntity>>
-  + filter(List<DataEntity>, Predicate<DataEntity>): List<DataEntity>
-}
-class SummaryGenerator {
-  + SummaryGenerator():
-  + generateSingleSubject(List<DataEntity>, List<Quantifier>, List<FuzzySet>, List<LinguisticVariable>): List<LinguisticSummaryDTO>
-  + generateMultiSubject(List<DataEntity>, List<DataEntity>, String, String, List<Quantifier>, List<LinguisticVariable>): List<LinguisticSummaryDTO>
-  - buildSentence(String, FuzzySet, String, String): String
-}
+
 class TrapezoidalMembershipFunction {
-  + TrapezoidalMembershipFunction(double, double, double, double):
-  - c: double
-  - a: double
-  - b: double
-  - d: double
+  + TrapezoidalMembershipFunction(double, double, double, double)
   + getMembership(double): double
   + getA(): double
   + getB(): double
   + getC(): double
   + getD(): double
 }
+
 class TriangularMembershipFunction {
-  + TriangularMembershipFunction(double, double, double):
-  - c: double
-  - b: double
-  - a: double
+  + TriangularMembershipFunction(double, double, double)
   + getMembership(double): double
   + getA(): double
   + getB(): double
   + getC(): double
 }
 
+abstract class Quantifier {
+  # name: String
+  # fuzzySet: FuzzySet
+  + Quantifier(String, FuzzySet)
+  + getName(): String
+  + getFuzzySet(): FuzzySet
+  + getMembership(double): double
+}
+
+class AbsoluteQuantifier {
+  + AbsoluteQuantifier(String, FuzzySet)
+}
+
+class RelativeQuantifier {
+  + RelativeQuantifier(String, FuzzySet)
+}
+
+class LinguisticVariable {
+  - internalVariable: Variable
+  - labels: Map<String, FuzzySet>
+  + LinguisticVariable(String)
+  + addLabel(String, FuzzySet): void
+  + getAttributeName(): String
+  + getLabelSet(String): FuzzySet
+  + getLabels(): Set<String>
+  + getLabelsMap(): Map<String, FuzzySet>
+  + getInternalVariable(): Variable
+}
+
+class FuzzyStatement {
+  - attributeName: String
+  - label: String
+  - fuzzySet: FuzzySet
+  + FuzzyStatement(String, String, FuzzySet)
+  + getAttributeName(): String
+  + getLabel(): String
+  + getFuzzySet(): FuzzySet
+}
+
+class LinguisticSummaryDTO {
+  - summaryText: String
+  - qualityMeasures: Map<Integer, Double>
+  - overallScore: double
+  + LinguisticSummaryDTO(String)
+  + getSummaryText(): String
+  + setMeasure(int, double): void
+  + getMeasure(int): double
+  + getQualityMeasures(): Map<Integer, Double>
+  + getOverallScore(): double
+  + setOverallScore(double): void
+  + toString(): String
+}
+
+class OptimalSummaryOptimizer {
+  + {static} optimize(List<LinguisticSummaryDTO>, Map<Integer, Double>): List<LinguisticSummaryDTO>
+}
+
+class QualityEvaluator {
+  + {static} evaluateT1(List<DataEntity>, Quantifier, FuzzyStatement, List<FuzzyStatement>): double
+  + {static} evaluateT1MultiForm1(List<DataEntity>, FuzzyStatement, FuzzyStatement, Quantifier, List<FuzzyStatement>): double
+  + {static} evaluateT1MultiForm2(List<DataEntity>, FuzzyStatement, FuzzyStatement, Quantifier, FuzzyStatement, List<FuzzyStatement>): double
+  + {static} evaluateT1MultiForm3(List<DataEntity>, FuzzyStatement, FuzzyStatement, List<FuzzyStatement>): double[]
+  + {static} evaluateT1MultiForm4(List<DataEntity>, FuzzyStatement, FuzzyStatement, FuzzyStatement, List<FuzzyStatement>): double[]
+  - {static} computeSubjectSummarizerRatio(List<DataEntity>, FuzzyStatement, FuzzyStatement, List<FuzzyStatement>): double
+  + {static} evaluateT2(List<FuzzyStatement>): double
+  + {static} evaluateT3(List<DataEntity>, FuzzyStatement, List<FuzzyStatement>): double
+  + {static} evaluateT4(List<DataEntity>, FuzzyStatement, List<FuzzyStatement>): double
+  + {static} evaluateT5(List<FuzzyStatement>): double
+  + {static} evaluateT6(Quantifier): double
+  + {static} evaluateT7(Quantifier): double
+  + {static} evaluateT8(List<FuzzyStatement>): double
+  + {static} evaluateT9(FuzzyStatement): double
+  + {static} evaluateT10(FuzzyStatement): double
+  + {static} evaluateT11(FuzzyStatement): double
+  ~ {static} evaluateCombinedMembership(DataEntity, List<FuzzyStatement>): double
+  ~ {static} evaluateSingleMembership(DataEntity, FuzzyStatement): double
+  - {static} degreeOfImprecision(FuzzySet): double
+  - {static} relativeCardinality(FuzzySet): double
+}
+
+class SummaryGenerator {
+  + generateSingleSubject(List<DataEntity>, List<Quantifier>, List<FuzzyStatement>, List<FuzzyStatement>): List<LinguisticSummaryDTO>
+  + generateMultiSubjectAll(List<DataEntity>, FuzzyStatement, FuzzyStatement, String, String, List<Quantifier>, List<FuzzyStatement>, List<FuzzyStatement>, boolean[]): List<LinguisticSummaryDTO>
+  - fillCommonMeasures(LinguisticSummaryDTO, List<DataEntity>, Quantifier, FuzzyStatement, List<FuzzyStatement>): void
+  - fillCommonMeasuresNoQuantifier(LinguisticSummaryDTO, List<DataEntity>, FuzzyStatement, List<FuzzyStatement>): void
+  - buildSentence(String, FuzzyStatement, FuzzyStatement): String
+  + {static} mapQuantifierName(String): String
+  - mapAttributeName(String): String
+}
+
+class SubjectPartitioner {
+  + {static} filter(List<DataEntity>, Predicate<DataEntity>): List<DataEntity>
+  + {static} split(List<DataEntity>, Predicate<DataEntity>): List<List<DataEntity>>
+}
+
 AbsoluteQuantifier             -[#000082,plain]-^  Quantifier
-GaussianMembershipFunction     -[#008200,dashed]-^  MembershipFunction
 RelativeQuantifier             -[#000082,plain]-^  Quantifier
+
+GaussianMembershipFunction     -[#008200,dashed]-^  MembershipFunction
 TrapezoidalMembershipFunction  -[#008200,dashed]-^  MembershipFunction
 TriangularMembershipFunction   -[#008200,dashed]-^  MembershipFunction
 
@@ -154,12 +174,12 @@ LinguisticVariable     o--  FuzzySet                : labels *
 FuzzyStatement         *--  FuzzySet                : fuzzySet
 
 SummaryGenerator       ..>  Quantifier              : «uses»
-SummaryGenerator       ..>  FuzzyStatement           : «uses»
+SummaryGenerator       ..>  FuzzyStatement          : «uses»
 SummaryGenerator       ..>  LinguisticSummaryDTO    : «creates»
 SummaryGenerator       ..>  QualityEvaluator        : «calls»
 QualityEvaluator       ..>  Quantifier              : «uses»
-QualityEvaluator       ..>  FuzzyStatement           : «uses»
+QualityEvaluator       ..>  FuzzyStatement          : «uses»
 QualityEvaluator       ..>  FuzzySet                : «uses»
 OptimalSummaryOptimizer ..> LinguisticSummaryDTO    : «ranks»
-
+QualityEvaluator -[hidden]down-> SubjectPartitioner
 @enduml
