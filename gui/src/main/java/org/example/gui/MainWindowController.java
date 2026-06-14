@@ -896,7 +896,8 @@ public class MainWindowController {
 
     private void updateAdvUniverseFields() {
         LabelDefinition.LabelType type = advTypeCombo.getValue();
-        if (type == null) return;
+        if (type == null)
+            return;
 
         String varName = "";
         if (type == LabelDefinition.LabelType.RELATIVE_QUANTIFIER) {
